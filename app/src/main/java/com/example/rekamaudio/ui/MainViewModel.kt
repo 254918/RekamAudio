@@ -52,6 +52,16 @@ class MainViewModel @Inject constructor(
         _uiState.value = RecordingUiState.Recording
     }
 
+    fun startOverlayService(resultCode: Int, data: Intent) {
+        val intent = Intent(context, AudioCaptureService::class.java).apply {
+            action = AudioCaptureService.ACTION_SHOW_OVERLAY
+            putExtra(AudioCaptureService.EXTRA_RESULT_CODE, resultCode)
+            putExtra(AudioCaptureService.EXTRA_RESULT_DATA, data)
+        }
+        context.startForegroundService(intent) // Or startService, but foreground is safer for overlay permission ops sometimes?
+        // _uiState.value = RecordingUiState.Idle // UI remains idle until actual recording starts
+    }
+
     fun stopRecordingService() {
         val intent = Intent(context, AudioCaptureService::class.java).apply {
             action = AudioCaptureService.ACTION_STOP

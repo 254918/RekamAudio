@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -64,12 +65,30 @@ fun MainScreen(
         )
     }
 
-    // Media Projection Launcher
+    // Overlay Permission Launcher
+    val overlayPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { 
+        if (android.provider.Settings.canDrawOverlays(context)) {
+            Toast.makeText(context, "Overlay Permission Granted", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Overlay Permission Required", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Media Projection Launcher (Modified to handle Overlay mode)
+    var isOverlayMode by remember { mutableStateOf(false) }
     val mediaProjectionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            viewModel.startRecordingService(result.resultCode, result.data!!)
+            if (isOverlayMode) {
+                viewModel.startOverlayService(result.resultCode, result.data!!)
+                // Minimize app?
+                // (context as? Activity)?.moveTaskToBack(true)
+            } else {
+                viewModel.startRecordingService(result.resultCode, result.data!!)
+            }
         } else {
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
@@ -85,6 +104,13 @@ fun MainScreen(
         } else true
 
         if (audioGranted && notificationGranted) {
+             // Check Overlay Permission if needed
+             if (isOverlayMode && !android.provider.Settings.canDrawOverlays(context)) {
+                 val intent = Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
+                 overlayPermissionLauncher.launch(intent)
+                 return@rememberLauncherForActivityResult
+             }
+
             val mediaProjectionManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
             mediaProjectionLauncher.launch(mediaProjectionManager.createScreenCaptureIntent())
         } else {
@@ -112,13 +138,31 @@ fun MainScreen(
                     }
                 )
             } else {
-                TopAppBar(title = { Text("Rekam Audio") })
+                TopAppBar(
+                    title = { Text("Rekam Audio") },
+                    actions = {
+                        IconButton(onClick = { 
+                            isOverlayMode = true
+                            if (uiState !is RecordingUiState.Recording) {
+                                // Request permissions sequence for overlay
+                                val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                                permissionLauncher.launch(permissions.toTypedArray())
+                            }
+                        }) {
+                            Icon(Icons.Default.Settings /* Using Settings as generic icon for now */, contentDescription = "Floating Mode") 
+                        }
+                    }
+                )
             }
         },
         floatingActionButton = {
             if (!isSelectionMode) {
                 FloatingActionButton(
                     onClick = {
+                        isOverlayMode = false
                         if (uiState is RecordingUiState.Recording) {
                             viewModel.stopRecordingService()
                         } else {

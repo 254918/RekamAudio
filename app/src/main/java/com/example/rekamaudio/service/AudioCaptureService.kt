@@ -25,6 +25,7 @@ import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.example.rekamaudio.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -40,8 +41,6 @@ import java.util.Locale
 @AndroidEntryPoint
 class AudioCaptureService : Service() {
 
-    // Repository dependency removed from Service as we write directly to MediaStore
-
     private var mediaProjectionManager: MediaProjectionManager? = null
     private var mediaProjection: MediaProjection? = null
     private var audioRecord: AudioRecord? = null
@@ -51,56 +50,120 @@ class AudioCaptureService : Service() {
     private var isRecording = false
     private var currentFileUri: Uri? = null
 
+    private lateinit var overlayManager: OverlayManager
+    private var savedResultCode: Int = 0
+    private var savedResultData: Intent? = null
+    private var isOverlayMode = false
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        overlayManager = OverlayManager(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent == null) return START_NOT_STICKY
 
-        val action = intent.action
-        if (action == ACTION_START) {
-            val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
-            val resultData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableExtra(EXTRA_RESULT_DATA)
-            }
-
-            if (resultCode != 0 && resultData != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        when (intent.action) {
+            ACTION_START -> {
+                val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
+                val resultData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
                 } else {
-                    startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA)
                 }
-                startRecording(resultCode, resultData)
+
+                if (resultCode != 0 && resultData != null) {
+                    savedResultCode = resultCode
+                    savedResultData = resultData
+                    
+                    startForegroundServiceNotification()
+                    startRecording(resultCode, resultData)
+                    overlayManager.updateState(true) // Update overlay if active
+                }
             }
-        } else if (action == ACTION_STOP) {
-            stopRecording()
-            stopSelf()
+            ACTION_STOP -> {
+                stopRecording()
+                overlayManager.updateState(false) // Update overlay
+                if (!isOverlayMode) {
+                    stopSelf()
+                }
+            }
+            ACTION_SHOW_OVERLAY -> {
+                 isOverlayMode = true
+                 val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
+                 val resultData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA, Intent::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(EXTRA_RESULT_DATA)
+                }
+                
+                if (resultCode != 0 && resultData != null) {
+                    savedResultCode = resultCode
+                    savedResultData = resultData
+                }
+                
+                startForegroundServiceNotification()
+                
+                overlayManager.showOverlay(
+                    onRecordClick = {
+                        if (savedResultCode != 0 && savedResultData != null) {
+                            startRecording(savedResultCode, savedResultData!!)
+                        } else {
+                            Log.e("AudioCaptureService", "Missing MediaProjection Permission Data")
+                        }
+                    },
+                    onStopClick = {
+                        stopRecording()
+                    },
+                    onCloseClick = {
+                        isOverlayMode = false
+                        stopRecording()
+                        overlayManager.removeOverlay()
+                        stopSelf()
+                    },
+                    isRecording = isRecording
+                )
+            }
+            ACTION_DISMISS_OVERLAY -> {
+                isOverlayMode = false
+                stopRecording()
+                overlayManager.removeOverlay()
+                stopSelf()
+            }
         }
 
         return START_NOT_STICKY
     }
+    
+    private fun startForegroundServiceNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+             startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        } else {
+             startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+        }
+    }
 
     private fun startRecording(resultCode: Int, resultData: Intent) {
-        if (isRecording) return
+        if (isRecording) {
+            // Already recording
+            return
+        }
 
         mediaProjection = mediaProjectionManager?.getMediaProjection(resultCode, resultData)
         mediaProjection?.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() {
                 stopRecording()
-                stopSelf()
+                overlayManager.updateState(false)
             }
         }, null)
 
         // Launch into background to allow delay and offload setup
         CoroutineScope(Dispatchers.IO).launch {
             try {
-
                 // CRITICAL FIX: Give the system time to register the projection
                 // before asking for AudioPlaybackCapture. This prevents the "silent audio" race condition.
                 kotlinx.coroutines.delay(500)
@@ -108,7 +171,8 @@ class AudioCaptureService : Service() {
                 val config = AudioPlaybackCaptureConfiguration.Builder(mediaProjection!!)
                     .addMatchingUsage(AudioAttributes.USAGE_GAME)
                     .addMatchingUsage(AudioAttributes.USAGE_UNKNOWN)
-                    .excludeUid(android.os.Process.myUid()) // Prevent feedback loop
+                    .addMatchingUsage(AudioAttributes.USAGE_MEDIA)
+                    // REMOVED .excludeUid() to allow self-recording for testing or internal audio general testing
                     .build()
 
                 val sampleRate = 48000 // Native android sample rate
@@ -118,10 +182,13 @@ class AudioCaptureService : Service() {
 
                 Log.d("AudioCaptureService", "Creating AudioRecord with bufferSize: $bufferSize")
 
-                if (androidx.core.content.ContextCompat.checkSelfPermission(this@AudioCaptureService, android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this@AudioCaptureService, android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                     Log.e("AudioCaptureService", "Recording permission not granted")
-                    stopRecording()
-                    stopSelf()
+                    stopRecording() // This is running on IO thread
+                    withContext(Dispatchers.Main) {
+                        overlayManager.updateState(false)
+                    }
+                    if (!isOverlayMode) stopSelf()
                     return@launch
                 }
 
@@ -140,13 +207,20 @@ class AudioCaptureService : Service() {
                 if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) {
                     Log.e("AudioCaptureService", "AudioRecord failed to initialize")
                     stopRecording()
-                    stopSelf()
+                    withContext(Dispatchers.Main) {
+                        overlayManager.updateState(false)
+                    }
+                    if (!isOverlayMode) stopSelf()
                     return@launch
                 }
 
                 audioRecord?.startRecording()
                 isRecording = true
                 Log.d("AudioCaptureService", "AudioRecord started successfully")
+                
+                withContext(Dispatchers.Main) {
+                    overlayManager.updateState(true)
+                }
 
                 recordingJob = launch {
                     encodeAndSaveAudio(bufferSize, sampleRate, 2)
@@ -154,12 +228,13 @@ class AudioCaptureService : Service() {
             } catch (e: Exception) {
                 Log.e("AudioCaptureService", "Error starting recording", e)
                 stopRecording()
-                stopSelf()
+                withContext(Dispatchers.Main) {
+                    overlayManager.updateState(false)
+                }
+                if (!isOverlayMode) stopSelf()
             }
         }
     }
-    
-
 
     private suspend fun encodeAndSaveAudio(bufferSize: Int, sampleRate: Int, channelCount: Int) {
         val uri = createMediaStoreEntry() ?: return
@@ -330,6 +405,11 @@ class AudioCaptureService : Service() {
         mediaProjection = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        overlayManager.removeOverlay()
+    }
+
     private fun createNotificationChannel() {
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
@@ -355,6 +435,8 @@ class AudioCaptureService : Service() {
         const val NOTIFICATION_ID = 1
         const val ACTION_START = "START"
         const val ACTION_STOP = "STOP"
+        const val ACTION_SHOW_OVERLAY = "SHOW_OVERLAY"
+        const val ACTION_DISMISS_OVERLAY = "DISMISS_OVERLAY" // New Action
         const val EXTRA_RESULT_CODE = "RESULT_CODE"
         const val EXTRA_RESULT_DATA = "RESULT_DATA"
     }

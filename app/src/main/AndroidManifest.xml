@@ -4,6 +4,7 @@
 
     <!-- Audio recording permission -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- Foreground service permissions (Android 14+) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

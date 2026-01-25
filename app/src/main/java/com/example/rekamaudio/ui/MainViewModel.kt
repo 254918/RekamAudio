@@ -19,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: AudioCaptureRepository,
+    private val audioPlayer: com.example.rekamaudio.player.AudioPlayer,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -27,6 +28,9 @@ class MainViewModel @Inject constructor(
 
     private val _recordings = MutableStateFlow<List<com.example.rekamaudio.data.model.Recording>>(emptyList())
     val recordings = _recordings.asStateFlow()
+
+    private val _playbackState = MutableStateFlow<Long?>(null)
+    val playbackState: StateFlow<Long?> = _playbackState.asStateFlow()
 
     init {
         observeRecordings()
@@ -42,7 +46,29 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun playRecording(recording: com.example.rekamaudio.data.model.Recording) {
+        if (_playbackState.value == recording.id) {
+            stopPlayback()
+        } else {
+            _playbackState.value = recording.id
+            audioPlayer.playFile(recording.fileUri) {
+                _playbackState.value = null
+            }
+        }
+    }
+
+    fun stopPlayback() {
+        audioPlayer.stop()
+        _playbackState.value = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.release()
+    }
+
     fun startRecordingService(resultCode: Int, data: Intent) {
+        stopPlayback() // Stop playback before recording
         val intent = Intent(context, AudioCaptureService::class.java).apply {
             action = AudioCaptureService.ACTION_START
             putExtra(AudioCaptureService.EXTRA_RESULT_CODE, resultCode)
@@ -53,6 +79,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun startOverlayService(resultCode: Int, data: Intent) {
+        stopPlayback() // Stop playback before overlay
         val intent = Intent(context, AudioCaptureService::class.java).apply {
             action = AudioCaptureService.ACTION_SHOW_OVERLAY
             putExtra(AudioCaptureService.EXTRA_RESULT_CODE, resultCode)
@@ -71,6 +98,9 @@ class MainViewModel @Inject constructor(
     }
 
     fun deleteRecording(recording: com.example.rekamaudio.data.model.Recording) {
+        if (_playbackState.value == recording.id) {
+            stopPlayback()
+        }
         viewModelScope.launch {
             repository.deleteRecording(recording)
                 .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to delete") }
@@ -118,7 +148,10 @@ class MainViewModel @Inject constructor(
         val idsToDelete = _selectedRecordingIds.value
         viewModelScope.launch {
             val recordingsToDelete = _recordings.value.filter { it.id in idsToDelete }
-            recordingsToDelete.forEach { repository.deleteRecording(it) }
+            recordingsToDelete.forEach { 
+                if (_playbackState.value == it.id) stopPlayback()
+                repository.deleteRecording(it) 
+            }
             clearSelection()
         }
     }

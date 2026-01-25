@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.PictureInPicture
@@ -43,6 +45,7 @@ fun MainScreen(
     val uiState by viewModel.uiState.collectAsState()
     val recordings by viewModel.recordings.collectAsState()
     val selectedIds by viewModel.selectedRecordingIds.collectAsState()
+    val playbackState by viewModel.playbackState.collectAsState()
     val context = LocalContext.current
     val isSelectionMode = selectedIds.isNotEmpty()
 
@@ -207,10 +210,12 @@ fun MainScreen(
                 LazyColumn {
                     items(recordings) { recording ->
                         val isSelected = selectedIds.contains(recording.id)
+                        val isPlaying = playbackState == recording.id
                         RecordingItem(
                             recording = recording,
                             isSelectionMode = isSelectionMode,
                             isSelected = isSelected,
+                            isPlaying = isPlaying, // Pass playing state
                             onDelete = { viewModel.deleteRecording(it) },
                             onRename = {
                                 recordingToRename = it
@@ -222,7 +227,7 @@ fun MainScreen(
                                 if (isSelectionMode) {
                                     viewModel.toggleSelection(recording.id)
                                 } else {
-                                    // TODO: Play audio
+                                    viewModel.playRecording(recording) // Use new play action
                                 }
                             }
                         )
@@ -239,6 +244,7 @@ fun RecordingItem(
     recording: Recording,
     isSelectionMode: Boolean,
     isSelected: Boolean,
+    isPlaying: Boolean,
     onDelete: (Recording) -> Unit,
     onRename: (Recording) -> Unit,
     onShare: (Recording) -> Unit,
@@ -274,9 +280,20 @@ fun RecordingItem(
             Column(modifier = Modifier.weight(1f).padding(8.dp)) {
                 Text(text = recording.fileName, style = MaterialTheme.typography.bodyLarge)
                 Text(text = "Date: ${Date(recording.createdAt)}", style = MaterialTheme.typography.labelSmall)
+                if (isPlaying) {
+                    PlaybackVisualizer(modifier = Modifier.height(24.dp).width(48.dp))
+                }
             }
             
             if (!isSelectionMode) {
+                IconButton(onClick = onClick) {
+                     if (isPlaying) {
+                        Icon(Icons.Default.Stop, contentDescription = "Stop")
+                     } else {
+                         Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+                     }
+                 }
+
                 IconButton(onClick = { expanded = true }) {
                     Icon(Icons.Default.MoreVert, contentDescription = "More")
                 }
@@ -297,6 +314,60 @@ fun RecordingItem(
             }
         }
     }
+}
+
+@Composable
+fun PlaybackVisualizer(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "visualizer")
+    
+    // Animate 3 bars with different offsets
+    val scale1 by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = androidx.compose.animation.core.LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bar1"
+    )
+    val scale2 by infiniteTransition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(400, delayMillis = 100, easing = androidx.compose.animation.core.LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bar2"
+    )
+    val scale3 by infiniteTransition.animateFloat(
+        initialValue = 0.4f,
+        targetValue = 0.7f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, delayMillis = 50, easing = androidx.compose.animation.core.LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "bar3"
+    )
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Bar(scale = scale1, color = MaterialTheme.colorScheme.primary)
+        Bar(scale = scale2, color = Color.LightGray)
+        Bar(scale = scale3, color = Color.LightGray)
+    }
+}
+
+@Composable
+fun Bar(scale: Float, color: Color) {
+    Box(
+        modifier = Modifier
+            .width(6.dp)
+            .fillMaxHeight(fraction = scale)
+            .background(color, shape = androidx.compose.foundation.shape.CircleShape)
+    )
 }
 
 @Composable

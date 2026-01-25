@@ -64,4 +64,78 @@ class MainViewModel @Inject constructor(
             loadRecordings()
         }
     }
+
+    fun deleteRecording(recording: com.example.rekamaudio.data.model.Recording) {
+        viewModelScope.launch {
+            repository.deleteRecording(recording)
+                .onSuccess { loadRecordings() }
+                .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to delete") }
+        }
+    }
+
+    fun renameRecording(recording: com.example.rekamaudio.data.model.Recording, newName: String) {
+        viewModelScope.launch {
+            repository.renameRecording(recording, newName)
+                .onSuccess { loadRecordings() }
+                .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to rename") }
+        }
+    }
+
+    fun shareRecording(recording: com.example.rekamaudio.data.model.Recording) {
+        val uri = android.net.Uri.parse(recording.fileUri)
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "audio/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val chooser = Intent.createChooser(shareIntent, "Share Recording").apply {
+             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(chooser)
+    }
+
+    // Selection Mode Logic
+    private val _selectedRecordingIds = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedRecordingIds = _selectedRecordingIds.asStateFlow()
+
+    fun toggleSelection(recordingId: Long) {
+        val current = _selectedRecordingIds.value
+        if (current.contains(recordingId)) {
+            _selectedRecordingIds.value = current - recordingId
+        } else {
+            _selectedRecordingIds.value = current + recordingId
+        }
+    }
+
+    fun clearSelection() {
+        _selectedRecordingIds.value = emptySet()
+    }
+
+    fun deleteSelectedRecordings() {
+        val idsToDelete = _selectedRecordingIds.value
+        viewModelScope.launch {
+            val recordingsToDelete = _recordings.value.filter { it.id in idsToDelete }
+            recordingsToDelete.forEach { repository.deleteRecording(it) }
+            clearSelection()
+            loadRecordings()
+        }
+    }
+
+    fun shareSelectedRecordings() {
+        val idsToShare = _selectedRecordingIds.value
+        val recordingsToShare = _recordings.value.filter { it.id in idsToShare }
+
+        val uris = ArrayList<android.net.Uri>()
+        recordingsToShare.forEach { uris.add(android.net.Uri.parse(it.fileUri)) }
+
+        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+            type = "audio/*"
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val chooser = Intent.createChooser(shareIntent, "Share Recordings").apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(chooser)
+    }
 }

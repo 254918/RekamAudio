@@ -34,8 +34,10 @@ class AudioCaptureRepositoryImpl @Inject constructor(
         // or just show all files that match our naming convention "recording_".
         
         // Note: RELATIVE_PATH is API 29+.
-        val selection = "${MediaStore.Audio.Media.DISPLAY_NAME} LIKE ?"
-        val selectionArgs = arrayOf("recording_%")
+        // Removed strict "recording_%" filtering to allow renamed files to appear.
+        // Assuming Scoped Storage / permissions limit us to our own files or relevant audio.
+        val selection = null
+        val selectionArgs = null
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
         val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -94,6 +96,27 @@ class AudioCaptureRepositoryImpl @Inject constructor(
                 Result.success(true)
             } else {
                 Result.failure(Exception("Could not delete file"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun renameRecording(recording: Recording, newName: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val uri = Uri.parse(recording.fileUri)
+            val finalName = if (newName.endsWith(".m4a")) newName else "$newName.m4a"
+            
+            val contentValues = android.content.ContentValues().apply {
+                put(MediaStore.Audio.Media.DISPLAY_NAME, finalName)
+            }
+
+            val rowsUpdated = context.contentResolver.update(uri, contentValues, null, null)
+            
+            if (rowsUpdated > 0) {
+                Result.success(true)
+            } else {
+                Result.failure(Exception("Could not rename file"))
             }
         } catch (e: Exception) {
             Result.failure(e)

@@ -118,6 +118,13 @@ class AudioCaptureService : Service() {
 
                 Log.d("AudioCaptureService", "Creating AudioRecord with bufferSize: $bufferSize")
 
+                if (androidx.core.content.ContextCompat.checkSelfPermission(this@AudioCaptureService, android.Manifest.permission.RECORD_AUDIO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    Log.e("AudioCaptureService", "Recording permission not granted")
+                    stopRecording()
+                    stopSelf()
+                    return@launch
+                }
+
                 audioRecord = AudioRecord.Builder()
                     .setAudioPlaybackCaptureConfig(config)
                     .setAudioFormat(

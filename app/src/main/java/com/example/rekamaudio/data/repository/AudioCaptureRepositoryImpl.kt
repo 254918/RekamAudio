@@ -2,13 +2,17 @@ package com.example.rekamaudio.data.repository
 
 import android.content.ContentUris
 import android.content.Context
+import android.database.ContentObserver
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import com.example.rekamaudio.data.model.Recording
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -18,7 +22,32 @@ class AudioCaptureRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : AudioCaptureRepository {
 
-    override fun getRecordings(): Flow<List<Recording>> = flow {
+    override fun getRecordings(): Flow<List<Recording>> = callbackFlow {
+        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
+            override fun onChange(selfChange: Boolean) {
+                trySend(queryRecordings())
+            }
+        }
+
+        // Initial query
+        trySend(queryRecordings())
+
+        // Register observer
+        val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+        } else {
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        }
+        
+        context.contentResolver.registerContentObserver(collection, true, observer)
+
+        awaitClose {
+            context.contentResolver.unregisterContentObserver(observer)
+        }
+    }.flowOn(Dispatchers.IO)
+
+
+    private fun queryRecordings(): List<Recording> {
         val recordings = mutableListOf<Recording>()
         
         val projection = arrayOf(
@@ -28,16 +57,6 @@ class AudioCaptureRepositoryImpl @Inject constructor(
             MediaStore.Audio.Media.DATE_ADDED
         )
         
-        // Filter for files in "Music/RekamAudio" (best effort filtering via RELATIVE_PATH on Android 10+)
-        // Or just show all audio files created by this app (ownership based).
-        // For simplicity and Android compatibility, we'll query generic audio and filter by name/path if possible,
-        // or just show all files that match our naming convention "recording_".
-        
-        // Note: RELATIVE_PATH is API 29+.
-        // Removed strict "recording_%" filtering to allow renamed files to appear.
-        // Assuming Scoped Storage / permissions limit us to our own files or relevant audio.
-        val selection = null
-        val selectionArgs = null
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
         val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -49,8 +68,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
         context.contentResolver.query(
             collection,
             projection,
-            selection,
-            selectionArgs,
+            null,
+            null,
             sortOrder
         )?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
@@ -70,7 +89,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
                 )
 
                 // Only include m4a files from our app
-                if (name.endsWith(".m4a")) {
+                // Ideally this should use relative path check for reliability but name check works for simple scenarios
+                if (name.endsWith(".m4a") && name.startsWith("recording_")) {
                      recordings.add(
                         Recording(
                             id = id,
@@ -83,10 +103,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
                 }
             }
         }
-        
-        emit(recordings)
-    }.flowOn(Dispatchers.IO)
-
+        return recordings
+    }
 
     override suspend fun deleteRecording(recording: Recording): Result<Boolean> = withContext(Dispatchers.IO) {
         try {

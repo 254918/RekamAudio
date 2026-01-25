@@ -29,10 +29,10 @@ class MainViewModel @Inject constructor(
     val recordings = _recordings.asStateFlow()
 
     init {
-        loadRecordings()
+        observeRecordings()
     }
 
-    private fun loadRecordings() {
+    private fun observeRecordings() {
         viewModelScope.launch {
             repository.getRecordings()
                 .catch { e -> _uiState.value = RecordingUiState.Error(e.message ?: "Unknown error") }
@@ -58,8 +58,7 @@ class MainViewModel @Inject constructor(
             putExtra(AudioCaptureService.EXTRA_RESULT_CODE, resultCode)
             putExtra(AudioCaptureService.EXTRA_RESULT_DATA, data)
         }
-        context.startForegroundService(intent) // Or startService, but foreground is safer for overlay permission ops sometimes?
-        // _uiState.value = RecordingUiState.Idle // UI remains idle until actual recording starts
+        context.startForegroundService(intent) 
     }
 
     fun stopRecordingService() {
@@ -68,17 +67,12 @@ class MainViewModel @Inject constructor(
         }
         context.startService(intent)
         _uiState.value = RecordingUiState.Idle
-        // Reload recordings after a short delay to allow file closing
-        viewModelScope.launch {
-            kotlinx.coroutines.delay(1000)
-            loadRecordings()
-        }
+        // No manual reload needed; ContentObserver handles it.
     }
 
     fun deleteRecording(recording: com.example.rekamaudio.data.model.Recording) {
         viewModelScope.launch {
             repository.deleteRecording(recording)
-                .onSuccess { loadRecordings() }
                 .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to delete") }
         }
     }
@@ -86,7 +80,6 @@ class MainViewModel @Inject constructor(
     fun renameRecording(recording: com.example.rekamaudio.data.model.Recording, newName: String) {
         viewModelScope.launch {
             repository.renameRecording(recording, newName)
-                .onSuccess { loadRecordings() }
                 .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to rename") }
         }
     }
@@ -127,7 +120,6 @@ class MainViewModel @Inject constructor(
             val recordingsToDelete = _recordings.value.filter { it.id in idsToDelete }
             recordingsToDelete.forEach { repository.deleteRecording(it) }
             clearSelection()
-            loadRecordings()
         }
     }
 

@@ -23,7 +23,7 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.PictureInPicture
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -139,46 +139,57 @@ fun MainScreen(
                 )
             } else {
                 TopAppBar(
-                    title = { Text("Rekam Audio") },
-                    actions = {
-                        IconButton(onClick = { 
-                            isOverlayMode = true
-                            if (uiState !is RecordingUiState.Recording) {
+                    title = { Text("Rekam Audio") }
+                )
+            }
+        },
+
+        floatingActionButton = {
+            if (!isSelectionMode) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Overlay Mode FAB
+                    if (uiState !is RecordingUiState.Recording) {
+                         SmallFloatingActionButton(
+                            onClick = {
+                                isOverlayMode = true
                                 // Request permissions sequence for overlay
                                 val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                     permissions.add(Manifest.permission.POST_NOTIFICATIONS)
                                 }
                                 permissionLauncher.launch(permissions.toTypedArray())
-                            }
-                        }) {
-                            Icon(Icons.Default.Settings /* Using Settings as generic icon for now */, contentDescription = "Floating Mode") 
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ) {
+                            Icon(Icons.Default.PictureInPicture, contentDescription = "Floating Mode")
                         }
                     }
-                )
-            }
-        },
-        floatingActionButton = {
-            if (!isSelectionMode) {
-                FloatingActionButton(
-                    onClick = {
-                        isOverlayMode = false
-                        if (uiState is RecordingUiState.Recording) {
-                            viewModel.stopRecordingService()
-                        } else {
-                            val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+
+                    // Main Recording FAB
+                    FloatingActionButton(
+                        onClick = {
+                            isOverlayMode = false
+                            if (uiState is RecordingUiState.Recording) {
+                                viewModel.stopRecordingService()
+                            } else {
+                                val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                                permissionLauncher.launch(permissions.toTypedArray())
                             }
-                            permissionLauncher.launch(permissions.toTypedArray())
-                        }
-                    },
-                    containerColor = if (uiState is RecordingUiState.Recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        imageVector = if (uiState is RecordingUiState.Recording) Icons.Default.Stop else Icons.Default.Mic,
-                        contentDescription = if (uiState is RecordingUiState.Recording) "Stop" else "Record"
-                    )
+                        },
+                        containerColor = if (uiState is RecordingUiState.Recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            imageVector = if (uiState is RecordingUiState.Recording) Icons.Default.Stop else Icons.Default.Mic,
+                            contentDescription = if (uiState is RecordingUiState.Recording) "Stop" else "Record"
+                        )
+                    }
                 }
             }
         }

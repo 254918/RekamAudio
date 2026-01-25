@@ -104,6 +104,8 @@ class AudioCaptureService : Service() {
                 // CRITICAL FIX: Give the system time to register the projection
                 // before asking for AudioPlaybackCapture. This prevents the "silent audio" race condition.
                 kotlinx.coroutines.delay(500)
+
+                val config = AudioPlaybackCaptureConfiguration.Builder(mediaProjection!!)
                     .addMatchingUsage(AudioAttributes.USAGE_GAME)
                     .addMatchingUsage(AudioAttributes.USAGE_UNKNOWN)
                     .excludeUid(android.os.Process.myUid()) // Prevent feedback loop

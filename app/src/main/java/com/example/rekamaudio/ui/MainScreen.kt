@@ -79,19 +79,14 @@ fun MainScreen(
         }
     }
 
-    // Media Projection Launcher (Modified to handle Overlay mode)
-    var isOverlayMode by remember { mutableStateOf(false) }
+    // Media Projection Launcher (Always Overlay Mode)
     val mediaProjectionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            if (isOverlayMode) {
-                viewModel.startOverlayService(result.resultCode, result.data!!)
-                // Minimize app?
-                // (context as? Activity)?.moveTaskToBack(true)
-            } else {
-                viewModel.startRecordingService(result.resultCode, result.data!!)
-            }
+            viewModel.startOverlayService(result.resultCode, result.data!!)
+            // Minimize app?
+            // (context as? Activity)?.moveTaskToBack(true)
         } else {
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
@@ -107,8 +102,8 @@ fun MainScreen(
         } else true
 
         if (audioGranted && notificationGranted) {
-             // Check Overlay Permission if needed
-             if (isOverlayMode && !android.provider.Settings.canDrawOverlays(context)) {
+             // Check Overlay Permission
+             if (!android.provider.Settings.canDrawOverlays(context)) {
                  val intent = Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
                  overlayPermissionLauncher.launch(intent)
                  return@rememberLauncherForActivityResult
@@ -149,50 +144,25 @@ fun MainScreen(
 
         floatingActionButton = {
             if (!isSelectionMode) {
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Overlay Mode FAB
-                    if (uiState !is RecordingUiState.Recording) {
-                         SmallFloatingActionButton(
-                            onClick = {
-                                isOverlayMode = true
-                                // Request permissions sequence for overlay
-                                val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    permissions.add(Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                permissionLauncher.launch(permissions.toTypedArray())
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        ) {
-                            Icon(Icons.Default.PictureInPicture, contentDescription = "Floating Mode")
-                        }
-                    }
-
-                    // Main Recording FAB
-                    FloatingActionButton(
-                        onClick = {
-                            isOverlayMode = false
-                            if (uiState is RecordingUiState.Recording) {
-                                viewModel.stopRecordingService()
-                            } else {
-                                val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    permissions.add(Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                permissionLauncher.launch(permissions.toTypedArray())
+                // Main Recording FAB (Always triggers Overlay Mode permissions if not recording)
+                FloatingActionButton(
+                    onClick = {
+                        if (uiState is RecordingUiState.Recording) {
+                            viewModel.stopRecordingService()
+                        } else {
+                            val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
                             }
-                        },
-                        containerColor = if (uiState is RecordingUiState.Recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                    ) {
-                        Icon(
-                            imageVector = if (uiState is RecordingUiState.Recording) Icons.Default.Stop else Icons.Default.Mic,
-                            contentDescription = if (uiState is RecordingUiState.Recording) "Stop" else "Record"
-                        )
-                    }
+                            permissionLauncher.launch(permissions.toTypedArray())
+                        }
+                    },
+                    containerColor = if (uiState is RecordingUiState.Recording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = if (uiState is RecordingUiState.Recording) Icons.Default.Stop else Icons.Default.Mic,
+                        contentDescription = if (uiState is RecordingUiState.Recording) "Stop" else "Record"
+                    )
                 }
             }
         }

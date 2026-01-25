@@ -1,0 +1,637 @@
+--------- beginning of system
+---------------------------- PROCESS STARTED (28145) for package com.example.rekamaudio ----------------------------
+--------- beginning of main
+2026-01-25 22:39:05.202 28145-28145 mple.rekamaudio         com.example.rekamaudio               I  Late-enabling -Xcheck:jni
+2026-01-25 22:39:05.219 28145-28145 mple.rekamaudio         com.example.rekamaudio               I  Using CollectorTypeCC GC.
+2026-01-25 22:39:05.225 28145-28145 nativeloader            com.example.rekamaudio               D  Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+2026-01-25 22:39:05.238 28145-28145 nativeloader            com.example.rekamaudio               D  Load /data/user/0/com.example.rekamaudio/code_cache/startup_agents/4d42d08a-agent.so using system ns (caller=<unknown>): ok
+2026-01-25 22:39:05.244 28145-28145 mple.rekamaudio         com.example.rekamaudio               W  hiddenapi: DexFile /data/data/com.example.rekamaudio/code_cache/.studio/instruments-855ca6dc.jar is in boot class path but is not in a known location
+2026-01-25 22:39:05.380 28145-28145 mple.rekamaudio         com.example.rekamaudio               W  Redefining intrinsic method java.lang.Thread java.lang.Thread.currentThread(). This may cause the unexpected use of the original definition of java.lang.Thread java.lang.Thread.currentThread()in methods that have already been compiled.
+2026-01-25 22:39:05.380 28145-28145 mple.rekamaudio         com.example.rekamaudio               W  Redefining intrinsic method boolean java.lang.Thread.interrupted(). This may cause the unexpected use of the original definition of boolean java.lang.Thread.interrupted()in methods that have already been compiled.
+2026-01-25 22:39:05.385 28145-28145 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 171979766; UID 10264; state: ENABLED
+2026-01-25 22:39:05.385 28145-28145 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 242716250; UID 10264; state: ENABLED
+2026-01-25 22:39:05.590 28145-28145 nativeloader            com.example.rekamaudio               D  Configuring clns-4 for other apk /data/app/~~ozZ-y2hA0ANafSIB2p1qHA==/com.example.rekamaudio-sjpCBr5n2yxI6lsBSYCrbw==/base.apk. target_sdk_version=35, uses_libraries=, library_path=/data/app/~~ozZ-y2hA0ANafSIB2p1qHA==/com.example.rekamaudio-sjpCBr5n2yxI6lsBSYCrbw==/lib/arm64:/data/app/~~ozZ-y2hA0ANafSIB2p1qHA==/com.example.rekamaudio-sjpCBr5n2yxI6lsBSYCrbw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.example.rekamaudio
+2026-01-25 22:39:05.597 28145-28145 nativeloader            com.example.rekamaudio               D  Load libframework-connectivity-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity.jar: ok
+2026-01-25 22:39:05.598 28145-28145 GraphicsEnvironment     com.example.rekamaudio               V  Currently set values for:
+2026-01-25 22:39:05.599 28145-28145 GraphicsEnvironment     com.example.rekamaudio               V    angle_gl_driver_selection_pkgs=[]
+2026-01-25 22:39:05.599 28145-28145 GraphicsEnvironment     com.example.rekamaudio               V    angle_gl_driver_selection_values=[]
+2026-01-25 22:39:05.599 28145-28145 GraphicsEnvironment     com.example.rekamaudio               V  ANGLE GameManagerService for com.example.rekamaudio: false
+2026-01-25 22:39:05.599 28145-28145 GraphicsEnvironment     com.example.rekamaudio               V  com.example.rekamaudio is not listed in per-application setting
+2026-01-25 22:39:05.599 28145-28145 GraphicsEnvironment     com.example.rekamaudio               V  Updatable production driver is not supported on the device.
+2026-01-25 22:39:05.685 28145-28145 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 237531167; UID 10264; state: DISABLED
+2026-01-25 22:39:05.688 28145-28166 Parcel                  com.example.rekamaudio               W  Expecting binder but got null!
+2026-01-25 22:39:05.951 28145-28149 mple.rekamaudio         com.example.rekamaudio               I  Compiler allocated 4412KB to compile void android.view.ViewRootImpl.performTraversals()
+2026-01-25 22:39:06.052 28145-28163 AdrenoGLES-0            com.example.rekamaudio               I  QUALCOMM build                   : 4783c89, I46ff5fc46f
+                                                                                                    Build Date                       : 11/30/20
+                                                                                                    OpenGL ES Shader Compiler Version: EV031.31.04.01
+                                                                                                    Local Branch                     : QPR2
+                                                                                                    Remote Branch                    : 
+                                                                                                    Remote Branch                    : 
+                                                                                                    Reconstruct Branch               : 
+2026-01-25 22:39:06.052 28145-28163 AdrenoGLES-0            com.example.rekamaudio               I  Build Config                     : S P 10.0.4 AArch64
+2026-01-25 22:39:06.052 28145-28163 AdrenoGLES-0            com.example.rekamaudio               I  Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+2026-01-25 22:39:06.059 28145-28163 AdrenoGLES-0            com.example.rekamaudio               I  PFP: 0x016dd093, ME: 0x00000000
+2026-01-25 22:39:06.062 28145-28163 AdrenoUtils             com.example.rekamaudio               W  <ReadGpuID_from_sysfs:197>: Failed to open /sys/class/kgsl/kgsl-3d0/gpu_model
+2026-01-25 22:39:06.062 28145-28163 AdrenoUtils             com.example.rekamaudio               W  <ReadGpuID:221>: Failed to read chip ID from gpu_model. Fallback to use the GSL path
+2026-01-25 22:39:06.074 28145-28163 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:39:06.176 28145-28145 Choreographer           com.example.rekamaudio               I  Skipped 37 frames!  The application may be doing too much work on its main thread.
+2026-01-25 22:39:11.006 28145-28177 ProfileInstaller        com.example.rekamaudio               D  Installing profile for com.example.rekamaudio
+2026-01-25 22:39:24.738 28145-28150 mple.rekamaudio         com.example.rekamaudio               I  Background concurrent copying GC freed 1804KB AllocSpace bytes, 0(0B) LOS objects, 84% free, 4413KB/28MB, paused 161us,54us total 135.474ms
+2026-01-25 22:47:23.906 28145-28163 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:48:26.665 28145-28163 OpenGLRenderer          com.example.rekamaudio               D  endAllActiveAnimators on 0xb400007c6f279af0 (UnprojectedRipple) with handle 0xb400007c0f2ac1f0
+2026-01-25 22:48:26.916 28145-28145 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 78294732; UID 10264; state: ENABLED
+2026-01-25 22:48:26.924 28145-28145 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 147798919; UID 10264; state: ENABLED
+2026-01-25 22:50:22.505 28145-28163 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+---------------------------- PROCESS ENDED (28145) for package com.example.rekamaudio ----------------------------
+---------------------------- PROCESS STARTED (28802) for package com.example.rekamaudio ----------------------------
+2026-01-25 22:51:06.975 28802-28802 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 171979766; UID 10264; state: ENABLED
+2026-01-25 22:51:06.976 28802-28802 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 242716250; UID 10264; state: ENABLED
+2026-01-25 22:51:07.220 28802-28802 nativeloader            com.example.rekamaudio               D  Configuring clns-4 for other apk /data/app/~~DUkfuMlHPTMefwehOx06fw==/com.example.rekamaudio-M0rJESB80U8IAW4167Cjwg==/base.apk. target_sdk_version=35, uses_libraries=, library_path=/data/app/~~DUkfuMlHPTMefwehOx06fw==/com.example.rekamaudio-M0rJESB80U8IAW4167Cjwg==/lib/arm64:/data/app/~~DUkfuMlHPTMefwehOx06fw==/com.example.rekamaudio-M0rJESB80U8IAW4167Cjwg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.example.rekamaudio
+2026-01-25 22:51:07.226 28802-28802 nativeloader            com.example.rekamaudio               D  Load libframework-connectivity-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity.jar: ok
+2026-01-25 22:51:07.230 28802-28802 GraphicsEnvironment     com.example.rekamaudio               V  Currently set values for:
+2026-01-25 22:51:07.230 28802-28802 GraphicsEnvironment     com.example.rekamaudio               V    angle_gl_driver_selection_pkgs=[]
+2026-01-25 22:51:07.230 28802-28802 GraphicsEnvironment     com.example.rekamaudio               V    angle_gl_driver_selection_values=[]
+2026-01-25 22:51:07.230 28802-28802 GraphicsEnvironment     com.example.rekamaudio               V  ANGLE GameManagerService for com.example.rekamaudio: false
+2026-01-25 22:51:07.230 28802-28802 GraphicsEnvironment     com.example.rekamaudio               V  com.example.rekamaudio is not listed in per-application setting
+2026-01-25 22:51:07.230 28802-28802 GraphicsEnvironment     com.example.rekamaudio               V  Updatable production driver is not supported on the device.
+2026-01-25 22:51:07.353 28802-28802 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 237531167; UID 10264; state: DISABLED
+2026-01-25 22:51:07.360 28802-28884 Parcel                  com.example.rekamaudio               W  Expecting binder but got null!
+2026-01-25 22:51:07.754 28802-28875 AdrenoGLES-0            com.example.rekamaudio               I  QUALCOMM build                   : 4783c89, I46ff5fc46f
+                                                                                                    Build Date                       : 11/30/20
+                                                                                                    OpenGL ES Shader Compiler Version: EV031.31.04.01
+                                                                                                    Local Branch                     : QPR2
+                                                                                                    Remote Branch                    : 
+                                                                                                    Remote Branch                    : 
+                                                                                                    Reconstruct Branch               : 
+2026-01-25 22:51:07.754 28802-28875 AdrenoGLES-0            com.example.rekamaudio               I  Build Config                     : S P 10.0.4 AArch64
+2026-01-25 22:51:07.754 28802-28875 AdrenoGLES-0            com.example.rekamaudio               I  Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+2026-01-25 22:51:07.757 28802-28875 AdrenoGLES-0            com.example.rekamaudio               I  PFP: 0x016dd093, ME: 0x00000000
+2026-01-25 22:51:07.759 28802-28875 AdrenoUtils             com.example.rekamaudio               W  <ReadGpuID_from_sysfs:197>: Failed to open /sys/class/kgsl/kgsl-3d0/gpu_model
+2026-01-25 22:51:07.759 28802-28875 AdrenoUtils             com.example.rekamaudio               W  <ReadGpuID:221>: Failed to read chip ID from gpu_model. Fallback to use the GSL path
+2026-01-25 22:51:07.764 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:51:07.795 28802-28802 Choreographer           com.example.rekamaudio               I  Skipped 33 frames!  The application may be doing too much work on its main thread.
+2026-01-25 22:51:07.849 28802-28827 mple.rekamaudio         com.example.rekamaudio               I  Compiler allocated 4412KB to compile void android.view.ViewRootImpl.performTraversals()
+2026-01-25 22:51:12.937 28802-28914 ProfileInstaller        com.example.rekamaudio               D  Installing profile for com.example.rekamaudio
+2026-01-25 22:51:26.463 28802-28828 mple.rekamaudio         com.example.rekamaudio               I  Background concurrent copying GC freed 1775KB AllocSpace bytes, 0(0B) LOS objects, 84% free, 4347KB/28MB, paused 125us,54us total 179.947ms
+2026-01-25 22:51:32.852 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:51:35.097 28802-28802 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 78294732; UID 10264; state: ENABLED
+2026-01-25 22:51:35.633 28802-28887 AudioCaptureService     com.example.rekamaudio               D  Creating AudioRecord with bufferSize: 15360
+2026-01-25 22:51:35.648 28802-28887 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:51:35.648 28802-28887 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:51:35.649 28802-28887 android.me...udioRecord com.example.rekamaudio               V  Will record from REMOTE_SUBMIX at full fixed volume
+2026-01-25 22:51:35.742 28802-28887 AudioCaptureService     com.example.rekamaudio               D  AudioRecord started successfully
+2026-01-25 22:51:35.766 28802-28889 MediaCodecList          com.example.rekamaudio               D  codecHandlesFormat: no format, so no extra checks
+2026-01-25 22:51:35.767 28802-28997 CCodec                  com.example.rekamaudio               D  allocate(c2.android.aac.encoder)
+2026-01-25 22:51:35.768 28802-28997 Codec2Client            com.example.rekamaudio               I  Available Codec2 services: "default" "software"
+2026-01-25 22:51:35.769 28802-28997 CCodec                  com.example.rekamaudio               I  setting up 'default' as default (vendor) store
+2026-01-25 22:51:35.774 28802-28997 CCodec                  com.example.rekamaudio               I  Created component [c2.android.aac.encoder]
+2026-01-25 22:51:35.774 28802-28997 CCodecConfig            com.example.rekamaudio               D  read media type: audio/mp4a-latm
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.max-count.values
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.subscribed-indices.values
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: input.buffers.allocator-ids.values
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.allocator-ids.values
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.allocator-ids.values
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.pool-ids.values
+2026-01-25 22:51:35.775 28802-28997 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.pool-ids.values
+2026-01-25 22:51:35.776 28802-28997 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:51:35.776 28802-28997 CCodecConfig            com.example.rekamaudio               D  c2 config diff is Dict {
+                                                                                                      c2::u32 coded.bitrate.value = 64000
+                                                                                                      c2::u32 coded.pl.level = 0
+                                                                                                      c2::u32 coded.pl.profile = 8192
+                                                                                                      c2::u32 coding.aac-sbr-mode.value = 3
+                                                                                                      c2::u32 input.buffers.max-size.value = 2048
+                                                                                                      c2::u32 input.delay.value = 0
+                                                                                                      string input.media-type.value = "audio/raw"
+                                                                                                      string output.media-type.value = "audio/mp4a-latm"
+                                                                                                      c2::u32 raw.channel-count.value = 1
+                                                                                                      c2::u32 raw.sample-rate.value = 44100
+                                                                                                    }
+2026-01-25 22:51:35.781 28802-28889 CodecSeeding            com.example.rekamaudio               D  Seed: codec c2.android.aac.encoder, mediatype audio/mp4a-latm, overrideable 1
+2026-01-25 22:51:35.781 28802-28889 CodecProperties         com.example.rekamaudio               D  setFeatureValue(_vq_eligible.device,1)
+2026-01-25 22:51:35.781 28802-28889 CodecProperties         com.example.rekamaudio               D  setFeatureValue(_quality.target,1)
+2026-01-25 22:51:35.781 28802-28889 CodecSeeding            com.example.rekamaudio               D  Seed: codec c2.android.aac.encoder, mediatype audio/mp4a-latm, overrideable 0
+2026-01-25 22:51:35.781 28802-28889 MediaCodec              com.example.rekamaudio               D  shapeMediaFormat: deltas(0): AMessage(what = 0x00000000) = {
+                                                                                                      }
+2026-01-25 22:51:35.781 28802-28997 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:51:35.781 28802-28997 CCodec                  com.example.rekamaudio               D  [c2.android.aac.encoder] buffers are bound to CCodec for this session
+2026-01-25 22:51:35.781 28802-28997 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for flags
+2026-01-25 22:51:35.781 28802-28997 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for encoder
+2026-01-25 22:51:35.782 28802-28997 CCodecConfig            com.example.rekamaudio               D  c2 config diff is   c2::u32 coded.bitrate.value = 192000
+                                                                                                      c2::u32 input.buffers.max-size.value = 4096
+                                                                                                      c2::u32 raw.channel-count.value = 2
+                                                                                                      c2::u32 raw.sample-rate.value = 48000
+2026-01-25 22:51:35.782 28802-28997 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1107298332.
+2026-01-25 22:51:35.782 28802-28997 CCodec                  com.example.rekamaudio               D  encoding statistics level = 0
+2026-01-25 22:51:35.782 28802-28997 CCodec                  com.example.rekamaudio               D  setup formats input: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t max-input-size = 16384
+                                                                                                      string mime = "audio/raw"
+                                                                                                      int32_t android._config-pcm-encoding = 2
+                                                                                                    }
+2026-01-25 22:51:35.782 28802-28997 CCodec                  com.example.rekamaudio               D  setup formats output: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t bitrate = 192000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t level = 0
+                                                                                                      int32_t max-bitrate = 192000
+                                                                                                      string mime = "audio/mp4a-latm"
+                                                                                                      int32_t profile = 2
+                                                                                                    }
+2026-01-25 22:51:35.782 28802-28997 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:51:35.784 28802-28997 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1342179345.
+2026-01-25 22:51:35.784 28802-28997 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 2415921170.
+2026-01-25 22:51:35.784 28802-28997 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792206.
+2026-01-25 22:51:35.784 28802-28997 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792194.
+2026-01-25 22:51:35.784 28802-28997 C2Store                 com.example.rekamaudio               D  Using ION
+2026-01-25 22:51:35.784 28802-28997 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#386] Created input block pool with allocatorID 16 => poolID 17 - OK (0)
+2026-01-25 22:51:35.785 28802-28997 CCodecBufferChannel     com.example.rekamaudio               I  [c2.android.aac.encoder#386] Created output block pool with allocatorID 16 => poolID 96 - OK
+2026-01-25 22:51:35.785 28802-28997 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#386] Configured output block pool ids 96 => OK
+2026-01-25 22:51:35.786 28802-28889 MPEG4Writer             com.example.rekamaudio               D  PreAllocation enabled
+2026-01-25 22:51:35.834 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:35.921 28802-28889 MPEG4Writer             com.example.rekamaudio               D  fpathconf _PC_FILESIZEBITS:64
+2026-01-25 22:51:35.921 28802-28889 MPEG4Writer             com.example.rekamaudio               D  File size limit set to 4503599627370495 bytes implicitly
+2026-01-25 22:51:35.922 28802-28889 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper Started
+2026-01-25 22:51:35.922 28802-28889 MPEG4Writer             com.example.rekamaudio               I  limits: 4503599627370495/0 bytes/us, bit rate: -1 bps and the estimated moov size 3192 bytes
+2026-01-25 22:51:35.923 28802-29005 MPEG4Writer             com.example.rekamaudio               I  setStartTimestampUs: 0
+2026-01-25 22:51:35.923 28802-29005 MPEG4Writer             com.example.rekamaudio               I  Earliest track starting time: 0
+2026-01-25 22:51:37.835 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:39.871 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:41.270 28802-28997 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf296038 : 5(81920 size) total buffers - 4(65536 size) used buffers - 68/73 (recycle/alloc) - 5/137 (fetch/transfer)
+2026-01-25 22:51:41.920 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:43.918 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:45.925 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:46.794 28802-28997 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf296038 : 5(81920 size) total buffers - 4(65536 size) used buffers - 137/142 (recycle/alloc) - 5/275 (fetch/transfer)
+2026-01-25 22:51:47.993 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:50.033 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:51:51.172 28802-28997 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#386] MediaCodec discarded an unknown buffer
+2026-01-25 22:51:51.172 28802-28997 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#386] MediaCodec discarded an unknown buffer
+2026-01-25 22:51:51.172 28802-28997 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#386] MediaCodec discarded an unknown buffer
+2026-01-25 22:51:51.172 28802-28997 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#386] MediaCodec discarded an unknown buffer
+2026-01-25 22:51:51.173 28802-28889 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:51:51.173 28802-29005 MediaWriter             com.example.rekamaudio               V  Track event err/info msg:101, trackId:1, type:1000,val:-1011
+2026-01-25 22:51:51.173 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:51:51.173 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopping
+2026-01-25 22:51:51.173 28802-29005 MPEG4Writer             com.example.rekamaudio               I  Received total/0-length (724/0) buffers and encoded 724 frames. - Audio
+2026-01-25 22:51:51.173 28802-29005 MPEG4Writer             com.example.rekamaudio               I  Audio track drift time: 0 us
+2026-01-25 22:51:51.173 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopped
+2026-01-25 22:51:51.173 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track stopped. Status:0. Stop source
+2026-01-25 22:51:51.174 28802-28997 hw-BpHwBinder           com.example.rekamaudio               I  onLastStrongRef automatically unlinking death recipients
+2026-01-25 22:51:51.174 28802-29003 MPEG4Writer             com.example.rekamaudio               D  0 chunks are written in the last batch
+2026-01-25 22:51:51.174 28802-28889 MPEG4Writer             com.example.rekamaudio               D  WriterThread stopped. Status:0
+2026-01-25 22:51:51.174 28802-28889 MPEG4Writer             com.example.rekamaudio               I  Adjust the moov start time from 0 us -> 0 us
+2026-01-25 22:51:51.174 28802-28889 MPEG4Writer             com.example.rekamaudio               I  The mp4 file will not be streamable.
+2026-01-25 22:51:51.174 28802-28889 MPEG4Writer             com.example.rekamaudio               I  MOOV atom was written to the file
+2026-01-25 22:51:51.174 28802-28889 MPEG4Writer             com.example.rekamaudio               D  release()
+2026-01-25 22:51:51.174 28802-28889 MPEG4Writer             com.example.rekamaudio               D  ftruncate mPreAllocateFileEndOffset:377730 mOffset:376979 mMdatEndOffset:373410 diff:751
+2026-01-25 22:51:51.176 28802-28997 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:51:51.176 28802-28997 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:51:51.176 28802-28997 MediaCodec              com.example.rekamaudio               W  no metrics handle found
+2026-01-25 22:51:51.179 28802-28889 MPEG4Writer             com.example.rekamaudio               D  final fsync() takes 4 ms, file size 376979
+2026-01-25 22:51:51.179 28802-28889 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper stopped
+2026-01-25 22:51:51.180 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Top 5 write durations(microseconds): #1:136 #2:136 #3:137 #4:178 #5:350
+2026-01-25 22:51:51.180 28802-28889 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:51:51.180 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:51:51.180 28802-28889 MPEG4Writer             com.example.rekamaudio               E  Stop() called but track is not started or stopped
+2026-01-25 22:51:51.218 28802-28833 MediaProjection         com.example.rekamaudio               V  Dispatch stop to 1 callbacks.
+2026-01-25 22:51:52.209 28802-28802 mple.rekamaudio         com.example.rekamaudio               W  Method boolean androidx.compose.runtime.snapshots.SnapshotStateList.conditionalUpdate(boolean, kotlin.jvm.functions.Function1) failed lock verification and will run slower.
+                                                                                                    Common causes for lock verification issues are non-optimized dex code
+                                                                                                    and incorrect proguard optimizations.
+2026-01-25 22:51:52.209 28802-28802 mple.rekamaudio         com.example.rekamaudio               W  Method boolean androidx.compose.runtime.snapshots.SnapshotStateList.conditionalUpdate$default(androidx.compose.runtime.snapshots.SnapshotStateList, boolean, kotlin.jvm.functions.Function1, int, java.lang.Object) failed lock verification and will run slower.
+2026-01-25 22:51:52.210 28802-28802 mple.rekamaudio         com.example.rekamaudio               W  Method java.lang.Object androidx.compose.runtime.snapshots.SnapshotStateList.mutate(kotlin.jvm.functions.Function1) failed lock verification and will run slower.
+2026-01-25 22:51:52.210 28802-28802 mple.rekamaudio         com.example.rekamaudio               W  Method void androidx.compose.runtime.snapshots.SnapshotStateList.update(boolean, kotlin.jvm.functions.Function1) failed lock verification and will run slower.
+2026-01-25 22:51:52.210 28802-28802 mple.rekamaudio         com.example.rekamaudio               W  Method void androidx.compose.runtime.snapshots.SnapshotStateList.update$default(androidx.compose.runtime.snapshots.SnapshotStateList, boolean, kotlin.jvm.functions.Function1, int, java.lang.Object) failed lock verification and will run slower.
+2026-01-25 22:51:56.797 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf296038 : 0(0 size) total buffers - 0(0 size) used buffers - 193/198 (recycle/alloc) - 5/386 (fetch/transfer)
+2026-01-25 22:51:56.797 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 1
+2026-01-25 22:52:01.564 28802-28802 Compatibil...geReporter com.example.rekamaudio               D  Compat change id reported: 147798919; UID 10264; state: ENABLED
+2026-01-25 22:52:01.578 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:52:04.745 28802-28889 AudioCaptureService     com.example.rekamaudio               D  Creating AudioRecord with bufferSize: 15360
+2026-01-25 22:52:04.760 28802-28889 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:52:04.760 28802-28889 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:52:04.761 28802-28889 android.me...udioRecord com.example.rekamaudio               V  Will record from REMOTE_SUBMIX at full fixed volume
+2026-01-25 22:52:04.860 28802-28889 AudioCaptureService     com.example.rekamaudio               D  AudioRecord started successfully
+2026-01-25 22:52:04.881 28802-28996 MediaCodecList          com.example.rekamaudio               D  codecHandlesFormat: no format, so no extra checks
+2026-01-25 22:52:04.883 28802-29154 CCodec                  com.example.rekamaudio               D  allocate(c2.android.aac.encoder)
+2026-01-25 22:52:04.885 28802-29154 CCodec                  com.example.rekamaudio               I  setting up 'default' as default (vendor) store
+2026-01-25 22:52:04.891 28802-29001 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf296038 : 0(0 size) total buffers - 0(0 size) used buffers - 193/198 (recycle/alloc) - 5/386 (fetch/transfer)
+2026-01-25 22:52:04.892 28802-29001 BufferPoolAccessor2.0   com.example.rekamaudio               D  Destruction - bufferpool2 0xb400007dbf296038 cached: 0/0M, 0/0% in use; allocs: 198, 97% recycled; transfers: 386, 99% unfetched
+2026-01-25 22:52:04.892 28802-29154 CCodec                  com.example.rekamaudio               I  Created component [c2.android.aac.encoder]
+2026-01-25 22:52:04.892 28802-29154 CCodecConfig            com.example.rekamaudio               D  read media type: audio/mp4a-latm
+2026-01-25 22:52:04.893 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.max-count.values
+2026-01-25 22:52:04.893 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.subscribed-indices.values
+2026-01-25 22:52:04.893 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: input.buffers.allocator-ids.values
+2026-01-25 22:52:04.894 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.allocator-ids.values
+2026-01-25 22:52:04.894 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.allocator-ids.values
+2026-01-25 22:52:04.894 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.pool-ids.values
+2026-01-25 22:52:04.894 28802-29154 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.pool-ids.values
+2026-01-25 22:52:04.895 28802-29154 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:52:04.895 28802-29154 CCodecConfig            com.example.rekamaudio               D  c2 config diff is Dict {
+                                                                                                      c2::u32 coded.bitrate.value = 64000
+                                                                                                      c2::u32 coded.pl.level = 0
+                                                                                                      c2::u32 coded.pl.profile = 8192
+                                                                                                      c2::u32 coding.aac-sbr-mode.value = 3
+                                                                                                      c2::u32 input.buffers.max-size.value = 2048
+                                                                                                      c2::u32 input.delay.value = 0
+                                                                                                      string input.media-type.value = "audio/raw"
+                                                                                                      string output.media-type.value = "audio/mp4a-latm"
+                                                                                                      c2::u32 raw.channel-count.value = 1
+                                                                                                      c2::u32 raw.sample-rate.value = 44100
+                                                                                                    }
+2026-01-25 22:52:04.898 28802-28996 MediaCodec              com.example.rekamaudio               D  shapeMediaFormat: deltas(0): AMessage(what = 0x00000000) = {
+                                                                                                      }
+2026-01-25 22:52:04.899 28802-29154 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:52:04.899 28802-29154 CCodec                  com.example.rekamaudio               D  [c2.android.aac.encoder] buffers are bound to CCodec for this session
+2026-01-25 22:52:04.899 28802-29154 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for flags
+2026-01-25 22:52:04.899 28802-29154 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for encoder
+2026-01-25 22:52:04.901 28802-29154 CCodecConfig            com.example.rekamaudio               D  c2 config diff is   c2::u32 coded.bitrate.value = 192000
+                                                                                                      c2::u32 input.buffers.max-size.value = 4096
+                                                                                                      c2::u32 raw.channel-count.value = 2
+                                                                                                      c2::u32 raw.sample-rate.value = 48000
+2026-01-25 22:52:04.901 28802-29154 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1107298332.
+2026-01-25 22:52:04.901 28802-29154 CCodec                  com.example.rekamaudio               D  encoding statistics level = 0
+2026-01-25 22:52:04.901 28802-29154 CCodec                  com.example.rekamaudio               D  setup formats input: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t max-input-size = 16384
+                                                                                                      string mime = "audio/raw"
+                                                                                                      int32_t android._config-pcm-encoding = 2
+                                                                                                    }
+2026-01-25 22:52:04.901 28802-29154 CCodec                  com.example.rekamaudio               D  setup formats output: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t bitrate = 192000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t level = 0
+                                                                                                      int32_t max-bitrate = 192000
+                                                                                                      string mime = "audio/mp4a-latm"
+                                                                                                      int32_t profile = 2
+                                                                                                    }
+2026-01-25 22:52:04.901 28802-29154 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:52:04.904 28802-29154 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1342179345.
+2026-01-25 22:52:04.904 28802-29154 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 2415921170.
+2026-01-25 22:52:04.904 28802-29154 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792206.
+2026-01-25 22:52:04.904 28802-29154 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792194.
+2026-01-25 22:52:04.905 28802-29154 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#212] Created input block pool with allocatorID 16 => poolID 18 - OK (0)
+2026-01-25 22:52:04.906 28802-29154 CCodecBufferChannel     com.example.rekamaudio               I  [c2.android.aac.encoder#212] Created output block pool with allocatorID 16 => poolID 98 - OK
+2026-01-25 22:52:04.906 28802-29154 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#212] Configured output block pool ids 98 => OK
+2026-01-25 22:52:04.909 28802-28996 MPEG4Writer             com.example.rekamaudio               D  PreAllocation enabled
+2026-01-25 22:52:04.946 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:05.043 28802-28996 MPEG4Writer             com.example.rekamaudio               D  fpathconf _PC_FILESIZEBITS:64
+2026-01-25 22:52:05.043 28802-28996 MPEG4Writer             com.example.rekamaudio               D  File size limit set to 4503599627370495 bytes implicitly
+2026-01-25 22:52:05.043 28802-28996 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper Started
+2026-01-25 22:52:05.044 28802-28996 MPEG4Writer             com.example.rekamaudio               I  limits: 4503599627370495/0 bytes/us, bit rate: -1 bps and the estimated moov size 3192 bytes
+2026-01-25 22:52:05.049 28802-29158 MPEG4Writer             com.example.rekamaudio               I  setStartTimestampUs: 0
+2026-01-25 22:52:05.049 28802-29158 MPEG4Writer             com.example.rekamaudio               I  Earliest track starting time: 0
+2026-01-25 22:52:06.951 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:08.955 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:09.892 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 0
+2026-01-25 22:52:10.385 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 68/73 (recycle/alloc) - 5/137 (fetch/transfer)
+2026-01-25 22:52:11.025 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:13.030 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:13.384 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:52:15.035 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:15.912 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 137/142 (recycle/alloc) - 5/275 (fetch/transfer)
+2026-01-25 22:52:17.104 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:19.111 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:21.116 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:21.436 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 3(49152 size) used buffers - 205/210 (recycle/alloc) - 5/413 (fetch/transfer)
+2026-01-25 22:52:23.186 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:25.191 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:26.791 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 273/278 (recycle/alloc) - 5/547 (fetch/transfer)
+2026-01-25 22:52:27.197 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:29.266 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:31.271 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:32.231 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 341/346 (recycle/alloc) - 5/683 (fetch/transfer)
+2026-01-25 22:52:33.276 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:35.347 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:37.351 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:37.586 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 3(49152 size) used buffers - 407/412 (recycle/alloc) - 5/817 (fetch/transfer)
+2026-01-25 22:52:39.355 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:41.425 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:42.887 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 475/480 (recycle/alloc) - 5/950 (fetch/transfer)
+2026-01-25 22:52:43.431 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:45.437 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:47.506 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:48.231 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 541/546 (recycle/alloc) - 5/1083 (fetch/transfer)
+2026-01-25 22:52:49.511 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:51.516 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:53.586 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:53.672 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 609/614 (recycle/alloc) - 5/1219 (fetch/transfer)
+2026-01-25 22:52:55.591 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:57.596 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:52:59.027 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 3(49152 size) used buffers - 675/680 (recycle/alloc) - 5/1353 (fetch/transfer)
+2026-01-25 22:52:59.665 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:01.671 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:03.676 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:04.466 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 3(49152 size) used buffers - 743/748 (recycle/alloc) - 5/1489 (fetch/transfer)
+2026-01-25 22:53:05.746 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:07.751 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:09.756 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:09.991 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 813/818 (recycle/alloc) - 5/1627 (fetch/transfer)
+2026-01-25 22:53:11.825 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:13.831 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:15.347 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 3(49152 size) used buffers - 879/884 (recycle/alloc) - 5/1761 (fetch/transfer)
+2026-01-25 22:53:15.836 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:17.906 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:19.912 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:20.648 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 947/952 (recycle/alloc) - 5/1894 (fetch/transfer)
+2026-01-25 22:53:21.916 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:23.986 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:25.991 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:26.086 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 1015/1020 (recycle/alloc) - 5/2030 (fetch/transfer)
+2026-01-25 22:53:27.996 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:30.066 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:31.516 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 3(49152 size) used buffers - 1081/1086 (recycle/alloc) - 5/2165 (fetch/transfer)
+2026-01-25 22:53:32.070 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:34.077 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:36.146 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:36.550 28802-29154 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 5(81920 size) total buffers - 4(65536 size) used buffers - 1145/1150 (recycle/alloc) - 5/2291 (fetch/transfer)
+2026-01-25 22:53:37.731 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:53:38.150 28802-28996 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:53:38.631 28802-29154 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#212] MediaCodec discarded an unknown buffer
+2026-01-25 22:53:38.631 28802-29154 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#212] MediaCodec discarded an unknown buffer
+2026-01-25 22:53:38.631 28802-29154 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#212] MediaCodec discarded an unknown buffer
+2026-01-25 22:53:38.631 28802-29154 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#212] MediaCodec discarded an unknown buffer
+2026-01-25 22:53:38.633 28802-28996 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:53:38.633 28802-29158 MediaWriter             com.example.rekamaudio               V  Track event err/info msg:101, trackId:1, type:1000,val:-1011
+2026-01-25 22:53:38.633 28802-28996 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:53:38.633 28802-28996 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopping
+2026-01-25 22:53:38.633 28802-29158 MPEG4Writer             com.example.rekamaudio               I  Received total/0-length (4396/0) buffers and encoded 4396 frames. - Audio
+2026-01-25 22:53:38.633 28802-29158 MPEG4Writer             com.example.rekamaudio               I  Audio track drift time: 0 us
+2026-01-25 22:53:38.633 28802-28996 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopped
+2026-01-25 22:53:38.633 28802-29154 hw-BpHwBinder           com.example.rekamaudio               I  onLastStrongRef automatically unlinking death recipients
+2026-01-25 22:53:38.633 28802-28996 MPEG4Writer             com.example.rekamaudio               D  Audio track stopped. Status:0. Stop source
+2026-01-25 22:53:38.634 28802-29156 MPEG4Writer             com.example.rekamaudio               D  0 chunks are written in the last batch
+2026-01-25 22:53:38.634 28802-28996 MPEG4Writer             com.example.rekamaudio               D  WriterThread stopped. Status:0
+2026-01-25 22:53:38.634 28802-28996 MPEG4Writer             com.example.rekamaudio               I  Adjust the moov start time from 0 us -> 0 us
+2026-01-25 22:53:38.634 28802-28996 MPEG4Writer             com.example.rekamaudio               I  The mp4 file will not be streamable.
+2026-01-25 22:53:38.634 28802-28996 MPEG4Writer             com.example.rekamaudio               I  MOOV atom was written to the file
+2026-01-25 22:53:38.634 28802-28996 MPEG4Writer             com.example.rekamaudio               D  release()
+2026-01-25 22:53:38.634 28802-28996 MPEG4Writer             com.example.rekamaudio               D  ftruncate mPreAllocateFileEndOffset:2272482 mOffset:2271731 mMdatEndOffset:2253474 diff:751
+2026-01-25 22:53:38.635 28802-29154 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:53:38.635 28802-29154 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:53:38.635 28802-29154 MediaCodec              com.example.rekamaudio               W  no metrics handle found
+2026-01-25 22:53:38.638 28802-28996 MPEG4Writer             com.example.rekamaudio               D  final fsync() takes 2 ms, file size 2271731
+2026-01-25 22:53:38.638 28802-28996 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper stopped
+2026-01-25 22:53:38.638 28802-28996 MPEG4Writer             com.example.rekamaudio               D  Top 5 write durations(microseconds): #1:563 #2:578 #3:1351 #4:1580 #5:2854
+2026-01-25 22:53:38.638 28802-28996 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:53:38.638 28802-28996 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:53:38.638 28802-28996 MPEG4Writer             com.example.rekamaudio               E  Stop() called but track is not started or stopped
+2026-01-25 22:53:38.668 28802-28840 MediaProjection         com.example.rekamaudio               V  Dispatch stop to 1 callbacks.
+2026-01-25 22:53:40.550 28802-28802 WindowOnBackDispatcher  com.example.rekamaudio               W  OnBackInvokedCallback is not enabled for the application.
+                                                                                                    Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+2026-01-25 22:53:43.927 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 0(0 size) total buffers - 0(0 size) used buffers - 1172/1177 (recycle/alloc) - 5/2344 (fetch/transfer)
+2026-01-25 22:53:43.928 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 1
+2026-01-25 22:54:05.159 28802-28884 Parcel                  com.example.rekamaudio               W  Expecting binder but got null!
+2026-01-25 22:54:05.174 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:54:15.408 28802-28996 AudioCaptureService     com.example.rekamaudio               D  Creating AudioRecord with bufferSize: 15360
+2026-01-25 22:54:15.433 28802-28996 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:54:15.434 28802-28996 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:54:15.435 28802-28996 android.me...udioRecord com.example.rekamaudio               V  Will record from REMOTE_SUBMIX at full fixed volume
+2026-01-25 22:54:15.522 28802-28996 AudioCaptureService     com.example.rekamaudio               D  AudioRecord started successfully
+2026-01-25 22:54:15.541 28802-28888 MediaCodecList          com.example.rekamaudio               D  codecHandlesFormat: no format, so no extra checks
+2026-01-25 22:54:15.545 28802-29353 CCodec                  com.example.rekamaudio               D  allocate(c2.android.aac.encoder)
+2026-01-25 22:54:15.548 28802-29353 CCodec                  com.example.rekamaudio               I  setting up 'default' as default (vendor) store
+2026-01-25 22:54:15.552 28802-29001 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a1248 : 0(0 size) total buffers - 0(0 size) used buffers - 1172/1177 (recycle/alloc) - 5/2344 (fetch/transfer)
+2026-01-25 22:54:15.552 28802-29001 BufferPoolAccessor2.0   com.example.rekamaudio               D  Destruction - bufferpool2 0xb400007dbf2a1248 cached: 0/0M, 0/0% in use; allocs: 1177, 100% recycled; transfers: 2344, 100% unfetched
+2026-01-25 22:54:15.553 28802-29353 CCodec                  com.example.rekamaudio               I  Created component [c2.android.aac.encoder]
+2026-01-25 22:54:15.553 28802-29353 CCodecConfig            com.example.rekamaudio               D  read media type: audio/mp4a-latm
+2026-01-25 22:54:15.555 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.max-count.values
+2026-01-25 22:54:15.556 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.subscribed-indices.values
+2026-01-25 22:54:15.556 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: input.buffers.allocator-ids.values
+2026-01-25 22:54:15.556 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.allocator-ids.values
+2026-01-25 22:54:15.556 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.allocator-ids.values
+2026-01-25 22:54:15.556 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.pool-ids.values
+2026-01-25 22:54:15.556 28802-29353 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.pool-ids.values
+2026-01-25 22:54:15.558 28802-29353 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:54:15.559 28802-29353 CCodecConfig            com.example.rekamaudio               D  c2 config diff is Dict {
+                                                                                                      c2::u32 coded.bitrate.value = 64000
+                                                                                                      c2::u32 coded.pl.level = 0
+                                                                                                      c2::u32 coded.pl.profile = 8192
+                                                                                                      c2::u32 coding.aac-sbr-mode.value = 3
+                                                                                                      c2::u32 input.buffers.max-size.value = 2048
+                                                                                                      c2::u32 input.delay.value = 0
+                                                                                                      string input.media-type.value = "audio/raw"
+                                                                                                      string output.media-type.value = "audio/mp4a-latm"
+                                                                                                      c2::u32 raw.channel-count.value = 1
+                                                                                                      c2::u32 raw.sample-rate.value = 44100
+                                                                                                    }
+2026-01-25 22:54:15.561 28802-28888 MediaCodec              com.example.rekamaudio               D  shapeMediaFormat: deltas(0): AMessage(what = 0x00000000) = {
+                                                                                                      }
+2026-01-25 22:54:15.561 28802-29353 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:54:15.561 28802-29353 CCodec                  com.example.rekamaudio               D  [c2.android.aac.encoder] buffers are bound to CCodec for this session
+2026-01-25 22:54:15.561 28802-29353 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for flags
+2026-01-25 22:54:15.561 28802-29353 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for encoder
+2026-01-25 22:54:15.562 28802-29353 CCodecConfig            com.example.rekamaudio               D  c2 config diff is   c2::u32 coded.bitrate.value = 192000
+                                                                                                      c2::u32 input.buffers.max-size.value = 4096
+                                                                                                      c2::u32 raw.channel-count.value = 2
+                                                                                                      c2::u32 raw.sample-rate.value = 48000
+2026-01-25 22:54:15.562 28802-29353 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1107298332.
+2026-01-25 22:54:15.563 28802-29353 CCodec                  com.example.rekamaudio               D  encoding statistics level = 0
+2026-01-25 22:54:15.563 28802-29353 CCodec                  com.example.rekamaudio               D  setup formats input: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t max-input-size = 16384
+                                                                                                      string mime = "audio/raw"
+                                                                                                      int32_t android._config-pcm-encoding = 2
+                                                                                                    }
+2026-01-25 22:54:15.563 28802-29353 CCodec                  com.example.rekamaudio               D  setup formats output: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t bitrate = 192000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t level = 0
+                                                                                                      int32_t max-bitrate = 192000
+                                                                                                      string mime = "audio/mp4a-latm"
+                                                                                                      int32_t profile = 2
+                                                                                                    }
+2026-01-25 22:54:15.563 28802-29353 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:54:15.564 28802-29353 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1342179345.
+2026-01-25 22:54:15.564 28802-29353 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 2415921170.
+2026-01-25 22:54:15.565 28802-29353 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792206.
+2026-01-25 22:54:15.565 28802-29353 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792194.
+2026-01-25 22:54:15.566 28802-29353 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#329] Created input block pool with allocatorID 16 => poolID 19 - OK (0)
+2026-01-25 22:54:15.567 28802-29353 CCodecBufferChannel     com.example.rekamaudio               I  [c2.android.aac.encoder#329] Created output block pool with allocatorID 16 => poolID 100 - OK
+2026-01-25 22:54:15.567 28802-29353 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#329] Configured output block pool ids 100 => OK
+2026-01-25 22:54:15.569 28802-28888 MPEG4Writer             com.example.rekamaudio               D  PreAllocation enabled
+2026-01-25 22:54:15.607 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:15.695 28802-28888 MPEG4Writer             com.example.rekamaudio               D  fpathconf _PC_FILESIZEBITS:64
+2026-01-25 22:54:15.695 28802-28888 MPEG4Writer             com.example.rekamaudio               D  File size limit set to 4503599627370495 bytes implicitly
+2026-01-25 22:54:15.695 28802-28888 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper Started
+2026-01-25 22:54:15.695 28802-28888 MPEG4Writer             com.example.rekamaudio               I  limits: 4503599627370495/0 bytes/us, bit rate: -1 bps and the estimated moov size 3192 bytes
+2026-01-25 22:54:15.697 28802-29357 MPEG4Writer             com.example.rekamaudio               I  setStartTimestampUs: 0
+2026-01-25 22:54:15.697 28802-29357 MPEG4Writer             com.example.rekamaudio               I  Earliest track starting time: 0
+2026-01-25 22:54:17.614 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:19.619 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:20.553 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 0
+2026-01-25 22:54:20.579 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 3(49152 size) used buffers - 61/66 (recycle/alloc) - 5/125 (fetch/transfer)
+2026-01-25 22:54:21.688 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:23.693 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:25.698 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:26.029 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 4(65536 size) used buffers - 131/136 (recycle/alloc) - 5/262 (fetch/transfer)
+2026-01-25 22:54:27.768 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:29.774 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:31.375 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 4(65536 size) used buffers - 197/202 (recycle/alloc) - 5/395 (fetch/transfer)
+2026-01-25 22:54:31.779 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:33.849 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:35.854 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:36.813 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 4(65536 size) used buffers - 265/270 (recycle/alloc) - 5/531 (fetch/transfer)
+2026-01-25 22:54:37.860 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:39.929 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:41.934 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:42.169 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 3(49152 size) used buffers - 331/336 (recycle/alloc) - 5/665 (fetch/transfer)
+2026-01-25 22:54:43.939 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:46.007 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:47.608 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 3(49152 size) used buffers - 399/404 (recycle/alloc) - 5/801 (fetch/transfer)
+2026-01-25 22:54:48.013 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:50.018 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:50.186 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:54:52.089 28802-28888 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:54:53.048 28802-29353 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 5(81920 size) total buffers - 3(49152 size) used buffers - 467/472 (recycle/alloc) - 5/937 (fetch/transfer)
+2026-01-25 22:54:54.010 28802-29353 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#329] MediaCodec discarded an unknown buffer
+2026-01-25 22:54:54.010 28802-29353 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#329] MediaCodec discarded an unknown buffer
+2026-01-25 22:54:54.010 28802-29353 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#329] MediaCodec discarded an unknown buffer
+2026-01-25 22:54:54.010 28802-29353 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#329] MediaCodec discarded an unknown buffer
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:54:54.012 28802-29357 MediaWriter             com.example.rekamaudio               V  Track event err/info msg:101, trackId:1, type:1000,val:-1011
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:54:54.012 28802-29357 MPEG4Writer             com.example.rekamaudio               I  Received total/0-length (1804/0) buffers and encoded 1804 frames. - Audio
+2026-01-25 22:54:54.012 28802-29357 MPEG4Writer             com.example.rekamaudio               I  Audio track drift time: 0 us
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopping
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopped
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               D  Audio track stopped. Status:0. Stop source
+2026-01-25 22:54:54.012 28802-29353 hw-BpHwBinder           com.example.rekamaudio               I  onLastStrongRef automatically unlinking death recipients
+2026-01-25 22:54:54.012 28802-29355 MPEG4Writer             com.example.rekamaudio               D  0 chunks are written in the last batch
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               D  WriterThread stopped. Status:0
+2026-01-25 22:54:54.012 28802-28888 MPEG4Writer             com.example.rekamaudio               I  Adjust the moov start time from 0 us -> 0 us
+2026-01-25 22:54:54.013 28802-28888 MPEG4Writer             com.example.rekamaudio               I  The mp4 file will not be streamable.
+2026-01-25 22:54:54.013 28802-28888 MPEG4Writer             com.example.rekamaudio               I  MOOV atom was written to the file
+2026-01-25 22:54:54.013 28802-28888 MPEG4Writer             com.example.rekamaudio               D  release()
+2026-01-25 22:54:54.013 28802-28888 MPEG4Writer             com.example.rekamaudio               D  ftruncate mPreAllocateFileEndOffset:935010 mOffset:934259 mMdatEndOffset:926370 diff:751
+2026-01-25 22:54:54.014 28802-29353 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:54:54.014 28802-29353 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:54:54.014 28802-29353 MediaCodec              com.example.rekamaudio               W  no metrics handle found
+2026-01-25 22:54:54.019 28802-28888 MPEG4Writer             com.example.rekamaudio               D  final fsync() takes 5 ms, file size 934259
+2026-01-25 22:54:54.020 28802-28888 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper stopped
+2026-01-25 22:54:54.020 28802-28888 MPEG4Writer             com.example.rekamaudio               D  Top 5 write durations(microseconds): #1:215 #2:309 #3:387 #4:1805 #5:3239
+2026-01-25 22:54:54.020 28802-28888 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:54:54.020 28802-28888 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:54:54.020 28802-28888 MPEG4Writer             com.example.rekamaudio               E  Stop() called but track is not started or stopped
+2026-01-25 22:54:54.032 28802-28893 MediaProjection         com.example.rekamaudio               V  Dispatch stop to 1 callbacks.
+2026-01-25 22:54:54.044 28802-28802 WindowOnBackDispatcher  com.example.rekamaudio               W  sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@f9d637e
+2026-01-25 22:54:58.562 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 0(0 size) total buffers - 0(0 size) used buffers - 481/486 (recycle/alloc) - 5/962 (fetch/transfer)
+2026-01-25 22:54:58.563 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 1
+2026-01-25 22:54:59.821 28802-28883 Parcel                  com.example.rekamaudio               W  Expecting binder but got null!
+2026-01-25 22:54:59.838 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:55:07.181 28802-28888 AudioCaptureService     com.example.rekamaudio               D  Creating AudioRecord with bufferSize: 15360
+2026-01-25 22:55:07.201 28802-28888 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:55:07.203 28802-28888 AudioPolicy             com.example.rekamaudio               V  Null context, checking permission via ActivityManager
+2026-01-25 22:55:07.205 28802-28888 android.me...udioRecord com.example.rekamaudio               V  Will record from REMOTE_SUBMIX at full fixed volume
+2026-01-25 22:55:07.307 28802-28888 AudioCaptureService     com.example.rekamaudio               D  AudioRecord started successfully
+2026-01-25 22:55:07.335 28802-28889 MediaCodecList          com.example.rekamaudio               D  codecHandlesFormat: no format, so no extra checks
+2026-01-25 22:55:07.337 28802-29495 CCodec                  com.example.rekamaudio               D  allocate(c2.android.aac.encoder)
+2026-01-25 22:55:07.339 28802-29495 CCodec                  com.example.rekamaudio               I  setting up 'default' as default (vendor) store
+2026-01-25 22:55:07.343 28802-29001 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf2a24c8 : 0(0 size) total buffers - 0(0 size) used buffers - 481/486 (recycle/alloc) - 5/962 (fetch/transfer)
+2026-01-25 22:55:07.343 28802-29001 BufferPoolAccessor2.0   com.example.rekamaudio               D  Destruction - bufferpool2 0xb400007dbf2a24c8 cached: 0/0M, 0/0% in use; allocs: 486, 99% recycled; transfers: 962, 99% unfetched
+2026-01-25 22:55:07.344 28802-29495 CCodec                  com.example.rekamaudio               I  Created component [c2.android.aac.encoder]
+2026-01-25 22:55:07.345 28802-29495 CCodecConfig            com.example.rekamaudio               D  read media type: audio/mp4a-latm
+2026-01-25 22:55:07.347 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.max-count.values
+2026-01-25 22:55:07.347 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.subscribed-indices.values
+2026-01-25 22:55:07.347 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: input.buffers.allocator-ids.values
+2026-01-25 22:55:07.347 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.allocator-ids.values
+2026-01-25 22:55:07.348 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.allocator-ids.values
+2026-01-25 22:55:07.348 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: output.buffers.pool-ids.values
+2026-01-25 22:55:07.348 28802-29495 ReflectedParamUpdater   com.example.rekamaudio               D  extent() != 1 for single value type: algo.buffers.pool-ids.values
+2026-01-25 22:55:07.350 28802-29495 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:55:07.350 28802-29495 CCodecConfig            com.example.rekamaudio               D  c2 config diff is Dict {
+                                                                                                      c2::u32 coded.bitrate.value = 64000
+                                                                                                      c2::u32 coded.pl.level = 0
+                                                                                                      c2::u32 coded.pl.profile = 8192
+                                                                                                      c2::u32 coding.aac-sbr-mode.value = 3
+                                                                                                      c2::u32 input.buffers.max-size.value = 2048
+                                                                                                      c2::u32 input.delay.value = 0
+                                                                                                      string input.media-type.value = "audio/raw"
+                                                                                                      string output.media-type.value = "audio/mp4a-latm"
+                                                                                                      c2::u32 raw.channel-count.value = 1
+                                                                                                      c2::u32 raw.sample-rate.value = 44100
+                                                                                                    }
+2026-01-25 22:55:07.353 28802-28889 MediaCodec              com.example.rekamaudio               D  shapeMediaFormat: deltas(0): AMessage(what = 0x00000000) = {
+                                                                                                      }
+2026-01-25 22:55:07.353 28802-29495 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:55:07.353 28802-29495 CCodec                  com.example.rekamaudio               D  [c2.android.aac.encoder] buffers are bound to CCodec for this session
+2026-01-25 22:55:07.353 28802-29495 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for flags
+2026-01-25 22:55:07.353 28802-29495 CCodecConfig            com.example.rekamaudio               D  no c2 equivalents for encoder
+2026-01-25 22:55:07.354 28802-29495 CCodecConfig            com.example.rekamaudio               D  c2 config diff is   c2::u32 coded.bitrate.value = 192000
+                                                                                                      c2::u32 input.buffers.max-size.value = 4096
+                                                                                                      c2::u32 raw.channel-count.value = 2
+                                                                                                      c2::u32 raw.sample-rate.value = 48000
+2026-01-25 22:55:07.354 28802-29495 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1107298332.
+2026-01-25 22:55:07.355 28802-29495 CCodec                  com.example.rekamaudio               D  encoding statistics level = 0
+2026-01-25 22:55:07.355 28802-29495 CCodec                  com.example.rekamaudio               D  setup formats input: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t max-input-size = 16384
+                                                                                                      string mime = "audio/raw"
+                                                                                                      int32_t android._config-pcm-encoding = 2
+                                                                                                    }
+2026-01-25 22:55:07.355 28802-29495 CCodec                  com.example.rekamaudio               D  setup formats output: AMessage(what = 0x00000000) = {
+                                                                                                      int32_t sample-rate = 48000
+                                                                                                      int32_t bitrate = 192000
+                                                                                                      int32_t channel-count = 2
+                                                                                                      int32_t level = 0
+                                                                                                      int32_t max-bitrate = 192000
+                                                                                                      string mime = "audio/mp4a-latm"
+                                                                                                      int32_t profile = 2
+                                                                                                    }
+2026-01-25 22:55:07.355 28802-29495 CCodecConfig            com.example.rekamaudio               I  query failed after returning 9 values (BAD_INDEX)
+2026-01-25 22:55:07.356 28802-29495 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 1342179345.
+2026-01-25 22:55:07.356 28802-29495 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 2415921170.
+2026-01-25 22:55:07.357 28802-29495 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792206.
+2026-01-25 22:55:07.357 28802-29495 Codec2Client            com.example.rekamaudio               W  query -- param skipped: index = 3254792194.
+2026-01-25 22:55:07.358 28802-29495 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#155] Created input block pool with allocatorID 16 => poolID 20 - OK (0)
+2026-01-25 22:55:07.359 28802-29495 CCodecBufferChannel     com.example.rekamaudio               I  [c2.android.aac.encoder#155] Created output block pool with allocatorID 16 => poolID 102 - OK
+2026-01-25 22:55:07.359 28802-29495 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#155] Configured output block pool ids 102 => OK
+2026-01-25 22:55:07.362 28802-28889 MPEG4Writer             com.example.rekamaudio               D  PreAllocation enabled
+2026-01-25 22:55:07.387 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:55:07.477 28802-28889 MPEG4Writer             com.example.rekamaudio               D  fpathconf _PC_FILESIZEBITS:64
+2026-01-25 22:55:07.477 28802-28889 MPEG4Writer             com.example.rekamaudio               D  File size limit set to 4503599627370495 bytes implicitly
+2026-01-25 22:55:07.477 28802-28889 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper Started
+2026-01-25 22:55:07.477 28802-28889 MPEG4Writer             com.example.rekamaudio               I  limits: 4503599627370495/0 bytes/us, bit rate: -1 bps and the estimated moov size 3192 bytes
+2026-01-25 22:55:07.478 28802-29502 MPEG4Writer             com.example.rekamaudio               I  setStartTimestampUs: 0
+2026-01-25 22:55:07.478 28802-29502 MPEG4Writer             com.example.rekamaudio               I  Earliest track starting time: 0
+2026-01-25 22:55:09.394 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:55:11.399 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:55:12.344 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 0
+2026-01-25 22:55:12.690 28802-29495 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf296288 : 5(81920 size) total buffers - 4(65536 size) used buffers - 67/72 (recycle/alloc) - 5/134 (fetch/transfer)
+2026-01-25 22:55:13.468 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:55:15.473 28802-28889 AudioCheck              com.example.rekamaudio               D  Recorded 15360 bytes, Max Amplitude: 0
+2026-01-25 22:55:15.592 28802-29495 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#155] MediaCodec discarded an unknown buffer
+2026-01-25 22:55:15.592 28802-29495 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#155] MediaCodec discarded an unknown buffer
+2026-01-25 22:55:15.592 28802-29495 CCodecBufferChannel     com.example.rekamaudio               D  [c2.android.aac.encoder#155] MediaCodec discarded an unknown buffer
+2026-01-25 22:55:15.594 28802-28889 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:55:15.594 28802-29502 MediaWriter             com.example.rekamaudio               V  Track event err/info msg:101, trackId:1, type:1000,val:-1011
+2026-01-25 22:55:15.594 28802-29502 MPEG4Writer             com.example.rekamaudio               I  Received total/0-length (387/0) buffers and encoded 387 frames. - Audio
+2026-01-25 22:55:15.594 28802-29502 MPEG4Writer             com.example.rekamaudio               I  Audio track drift time: 0 us
+2026-01-25 22:55:15.594 28802-29495 hw-BpHwBinder           com.example.rekamaudio               I  onLastStrongRef automatically unlinking death recipients
+2026-01-25 22:55:15.595 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:55:15.595 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopping
+2026-01-25 22:55:15.595 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track source stopped
+2026-01-25 22:55:15.596 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track stopped. Status:0. Stop source
+2026-01-25 22:55:15.597 28802-29495 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:55:15.597 28802-29495 MediaCodec              com.example.rekamaudio               D  flushMediametrics
+2026-01-25 22:55:15.597 28802-29495 MediaCodec              com.example.rekamaudio               W  no metrics handle found
+2026-01-25 22:55:15.599 28802-29497 MPEG4Writer             com.example.rekamaudio               D  0 chunks are written in the last batch
+2026-01-25 22:55:15.599 28802-28889 MPEG4Writer             com.example.rekamaudio               D  WriterThread stopped. Status:0
+2026-01-25 22:55:15.599 28802-28889 MPEG4Writer             com.example.rekamaudio               I  Adjust the moov start time from 0 us -> 0 us
+2026-01-25 22:55:15.599 28802-28889 MPEG4Writer             com.example.rekamaudio               I  MOOV atom was written to the file
+2026-01-25 22:55:15.599 28802-28889 MPEG4Writer             com.example.rekamaudio               D  release()
+2026-01-25 22:55:15.599 28802-28889 MPEG4Writer             com.example.rekamaudio               D  ftruncate mPreAllocateFileEndOffset:203838 mOffset:2253 mMdatEndOffset:200866 diff:2972
+2026-01-25 22:55:15.604 28802-28889 MPEG4Writer             com.example.rekamaudio               D  final fsync() takes 4 ms, file size 200866
+2026-01-25 22:55:15.605 28802-28889 MPEG4Writer             com.example.rekamaudio               D  MP4WtrCtrlHlpLooper stopped
+2026-01-25 22:55:15.605 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Top 5 write durations(microseconds): #1:115 #2:145 #3:174 #4:200 #5:214
+2026-01-25 22:55:15.605 28802-28889 MPEG4Writer             com.example.rekamaudio               D  reset()
+2026-01-25 22:55:15.605 28802-28889 MPEG4Writer             com.example.rekamaudio               D  Audio track stopping. Stop source
+2026-01-25 22:55:15.605 28802-28889 MPEG4Writer             com.example.rekamaudio               E  Stop() called but track is not started or stopped
+2026-01-25 22:55:15.708 28802-28833 MediaProjection         com.example.rekamaudio               V  Dispatch stop to 1 callbacks.
+2026-01-25 22:55:15.732 28802-28802 WindowOnBackDispatcher  com.example.rekamaudio               W  sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@9769592
+2026-01-25 22:55:19.409 28802-28875 OpenGLRenderer          com.example.rekamaudio               E  Unable to match the desired swap behavior.
+2026-01-25 22:55:20.346 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  bufferpool2 0xb400007dbf296288 : 0(0 size) total buffers - 0(0 size) used buffers - 103/108 (recycle/alloc) - 5/208 (fetch/transfer)
+2026-01-25 22:55:20.346 28802-29000 BufferPoolAccessor2.0   com.example.rekamaudio               D  evictor expired: 1, evicted: 1

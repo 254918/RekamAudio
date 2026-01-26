@@ -1,36 +1,37 @@
 package com.example.rekamaudio.ui
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.rekamaudio.data.model.Recording
 import com.example.rekamaudio.data.repository.AudioCaptureRepository
+import com.example.rekamaudio.player.AudioPlayer
 import com.example.rekamaudio.service.AudioCaptureService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: AudioCaptureRepository,
-    private val audioPlayer: com.example.rekamaudio.player.AudioPlayer,
-    @ApplicationContext private val context: Context
+    private val audioPlayer: AudioPlayer
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<RecordingUiState>(RecordingUiState.Idle)
     val uiState: StateFlow<RecordingUiState> = _uiState.asStateFlow()
 
-    private val _recordings = MutableStateFlow<List<com.example.rekamaudio.data.model.Recording>>(emptyList())
+    private val _recordings = MutableStateFlow<List<Recording>>(emptyList())
     val recordings = _recordings.asStateFlow()
 
     private val _playbackState = MutableStateFlow<Long?>(null)
     val playbackState: StateFlow<Long?> = _playbackState.asStateFlow()
+
+    private val _events = MutableSharedFlow<MainEvent>()
+    val events = _events.asSharedFlow()
+
+    private val _selectedRecordingIds = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedRecordingIds = _selectedRecordingIds.asStateFlow()
 
     init {
         observeRecordings()
@@ -40,13 +41,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getRecordings()
                 .catch { e -> _uiState.value = RecordingUiState.Error(e.message ?: "Unknown error") }
-                .collect { list ->
-                    _recordings.value = list
-                }
+                .collect { list -> _recordings.value = list }
         }
     }
 
-    fun playRecording(recording: com.example.rekamaudio.data.model.Recording) {
+    fun playRecording(recording: Recording) {
         if (_playbackState.value == recording.id) {
             stopPlayback()
         } else {
@@ -68,75 +67,51 @@ class MainViewModel @Inject constructor(
     }
 
     fun startRecordingService(resultCode: Int, data: Intent) {
-        stopPlayback() // Stop playback before recording
-        val intent = Intent(context, AudioCaptureService::class.java).apply {
-            action = AudioCaptureService.ACTION_START
-            putExtra(AudioCaptureService.EXTRA_RESULT_CODE, resultCode)
-            putExtra(AudioCaptureService.EXTRA_RESULT_DATA, data)
+        stopPlayback()
+        viewModelScope.launch {
+            _events.emit(MainEvent.StartRecordingService(resultCode, data))
+            _uiState.value = RecordingUiState.Recording
         }
-        context.startForegroundService(intent)
-        _uiState.value = RecordingUiState.Recording
     }
 
     fun startOverlayService(resultCode: Int, data: Intent) {
-        stopPlayback() // Stop playback before overlay
-        val intent = Intent(context, AudioCaptureService::class.java).apply {
-            action = AudioCaptureService.ACTION_SHOW_OVERLAY
-            putExtra(AudioCaptureService.EXTRA_RESULT_CODE, resultCode)
-            putExtra(AudioCaptureService.EXTRA_RESULT_DATA, data)
+        stopPlayback()
+        viewModelScope.launch {
+            _events.emit(MainEvent.StartOverlayService(resultCode, data))
         }
-        context.startForegroundService(intent) 
     }
 
     fun stopRecordingService() {
-        val intent = Intent(context, AudioCaptureService::class.java).apply {
-            action = AudioCaptureService.ACTION_STOP
+        viewModelScope.launch {
+            _events.emit(MainEvent.StopRecordingService(AudioCaptureService.ACTION_STOP))
+            _uiState.value = RecordingUiState.Idle
         }
-        context.startService(intent)
-        _uiState.value = RecordingUiState.Idle
-        // No manual reload needed; ContentObserver handles it.
     }
 
-    fun deleteRecording(recording: com.example.rekamaudio.data.model.Recording) {
-        if (_playbackState.value == recording.id) {
-            stopPlayback()
-        }
+    fun deleteRecording(recording: Recording) {
+        if (_playbackState.value == recording.id) stopPlayback()
         viewModelScope.launch {
             repository.deleteRecording(recording)
                 .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to delete") }
         }
     }
 
-    fun renameRecording(recording: com.example.rekamaudio.data.model.Recording, newName: String) {
+    fun renameRecording(recording: Recording, newName: String) {
         viewModelScope.launch {
             repository.renameRecording(recording, newName)
                 .onFailure { _uiState.value = RecordingUiState.Error(it.message ?: "Failed to rename") }
         }
     }
 
-    fun shareRecording(recording: com.example.rekamaudio.data.model.Recording) {
-        val uri = android.net.Uri.parse(recording.fileUri)
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "audio/*"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    fun shareRecording(recording: Recording) {
+        viewModelScope.launch {
+            _events.emit(MainEvent.ShareRecording(recording.fileUri))
         }
-        val chooser = Intent.createChooser(shareIntent, "Share Recording").apply {
-             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(chooser)
     }
 
-    // Selection Mode Logic
-    private val _selectedRecordingIds = MutableStateFlow<Set<Long>>(emptySet())
-    val selectedRecordingIds = _selectedRecordingIds.asStateFlow()
-
     fun toggleSelection(recordingId: Long) {
-        val current = _selectedRecordingIds.value
-        if (current.contains(recordingId)) {
-            _selectedRecordingIds.value = current - recordingId
-        } else {
-            _selectedRecordingIds.value = current + recordingId
+        _selectedRecordingIds.update { current ->
+            if (current.contains(recordingId)) current - recordingId else current + recordingId
         }
     }
 
@@ -147,10 +122,9 @@ class MainViewModel @Inject constructor(
     fun deleteSelectedRecordings() {
         val idsToDelete = _selectedRecordingIds.value
         viewModelScope.launch {
-            val recordingsToDelete = _recordings.value.filter { it.id in idsToDelete }
-            recordingsToDelete.forEach { 
+            _recordings.value.filter { it.id in idsToDelete }.forEach {
                 if (_playbackState.value == it.id) stopPlayback()
-                repository.deleteRecording(it) 
+                repository.deleteRecording(it)
             }
             clearSelection()
         }
@@ -158,19 +132,12 @@ class MainViewModel @Inject constructor(
 
     fun shareSelectedRecordings() {
         val idsToShare = _selectedRecordingIds.value
-        val recordingsToShare = _recordings.value.filter { it.id in idsToShare }
-
-        val uris = ArrayList<android.net.Uri>()
-        recordingsToShare.forEach { uris.add(android.net.Uri.parse(it.fileUri)) }
-
-        val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-            type = "audio/*"
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val uris = _recordings.value
+            .filter { it.id in idsToShare }
+            .map { it.fileUri }
+        
+        viewModelScope.launch {
+            _events.emit(MainEvent.ShareSelected(uris))
         }
-        val chooser = Intent.createChooser(shareIntent, "Share Recordings").apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        context.startActivity(chooser)
     }
 }

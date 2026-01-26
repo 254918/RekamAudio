@@ -10,10 +10,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,23 +17,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.filled.PictureInPicture
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.rekamaudio.data.model.Recording
-import java.util.Date
+import com.example.rekamaudio.service.AudioCaptureService
+import com.example.rekamaudio.ui.components.RecordingItem
+import com.example.rekamaudio.ui.components.RenameDialog
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
@@ -49,10 +43,59 @@ fun MainScreen(
     val context = LocalContext.current
     val isSelectionMode = selectedIds.isNotEmpty()
 
-    // Handle Back Press to clear selection
-    BackHandler(enabled = isSelectionMode) {
-        viewModel.clearSelection()
+    // Event Handling
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is MainEvent.StartRecordingService -> {
+                    val intent = Intent(context, AudioCaptureService::class.java).apply {
+                        action = AudioCaptureService.ACTION_START
+                        putExtra(AudioCaptureService.EXTRA_RESULT_CODE, event.resultCode)
+                        putExtra(AudioCaptureService.EXTRA_RESULT_DATA, event.data)
+                    }
+                    context.startForegroundService(intent)
+                }
+                is MainEvent.StartOverlayService -> {
+                    val intent = Intent(context, AudioCaptureService::class.java).apply {
+                        action = AudioCaptureService.ACTION_SHOW_OVERLAY
+                        putExtra(AudioCaptureService.EXTRA_RESULT_CODE, event.resultCode)
+                        putExtra(AudioCaptureService.EXTRA_RESULT_DATA, event.data)
+                    }
+                    context.startForegroundService(intent)
+                }
+                is MainEvent.StopRecordingService -> {
+                    val intent = Intent(context, AudioCaptureService::class.java).apply {
+                        action = event.action
+                    }
+                    context.startService(intent)
+                }
+                is MainEvent.ShareRecording -> {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "audio/*"
+                        putExtra(Intent.EXTRA_STREAM, android.net.Uri.parse(event.uri))
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Share Recording"))
+                }
+                is MainEvent.ShareSelected -> {
+                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                        type = "audio/*"
+                        putParcelableArrayListExtra(
+                            Intent.EXTRA_STREAM,
+                            ArrayList(event.uris.map { android.net.Uri.parse(it) })
+                        )
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "Share Recordings"))
+                }
+                is MainEvent.Error -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
+
+    BackHandler(enabled = isSelectionMode) { viewModel.clearSelection() }
 
     var showRenameDialog by remember { mutableStateOf(false) }
     var recordingToRename by remember { mutableStateOf<Recording?>(null) }
@@ -61,56 +104,42 @@ fun MainScreen(
         RenameDialog(
             recording = recordingToRename!!,
             onDismiss = { showRenameDialog = false },
-            onRename = { newName ->
-                viewModel.renameRecording(recordingToRename!!, newName)
+            onRename = { 
+                viewModel.renameRecording(recordingToRename!!, it)
                 showRenameDialog = false
             }
         )
     }
 
-    // Overlay Permission Launcher
-    val overlayPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { 
-        if (android.provider.Settings.canDrawOverlays(context)) {
-            Toast.makeText(context, "Overlay Permission Granted", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(context, "Overlay Permission Required", Toast.LENGTH_SHORT).show()
-        }
+    val overlayPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val msg = if (android.provider.Settings.canDrawOverlays(context)) "Overlay Permission Granted" else "Overlay Permission Required"
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
-    // Media Projection Launcher (Always Overlay Mode)
-    val mediaProjectionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+    val mediaProjectionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
             viewModel.startOverlayService(result.resultCode, result.data!!)
-            // Minimize app?
-            // (context as? Activity)?.moveTaskToBack(true)
         } else {
             Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Permission Launcher
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         val audioGranted = permissions[Manifest.permission.RECORD_AUDIO] ?: false
         val notificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions[Manifest.permission.POST_NOTIFICATIONS] ?: false
         } else true
 
         if (audioGranted && notificationGranted) {
-             // Check Overlay Permission
              if (!android.provider.Settings.canDrawOverlays(context)) {
-                 val intent = Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
-                 overlayPermissionLauncher.launch(intent)
+                 overlayPermissionLauncher.launch(Intent(
+                     android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                     android.net.Uri.parse("package:${context.packageName}")
+                 ))
                  return@rememberLauncherForActivityResult
              }
-
-            val mediaProjectionManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
-            mediaProjectionLauncher.launch(mediaProjectionManager.createScreenCaptureIntent())
+            val mpManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+            mediaProjectionLauncher.launch(mpManager.createScreenCaptureIntent())
         } else {
             Toast.makeText(context, "Permissions required", Toast.LENGTH_SHORT).show()
         }
@@ -136,23 +165,18 @@ fun MainScreen(
                     }
                 )
             } else {
-                TopAppBar(
-                    title = { Text("Rekam Audio") }
-                )
+                TopAppBar(title = { Text("Rekam Audio") })
             }
         },
-
         floatingActionButton = {
             if (!isSelectionMode) {
-                // Main Recording FAB (Always triggers Overlay Mode permissions if not recording)
                 FloatingActionButton(
                     onClick = {
                         if (uiState is RecordingUiState.Recording) {
                             viewModel.stopRecordingService()
                         } else {
-                            val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+                            val permissions = mutableListOf(Manifest.permission.RECORD_AUDIO).apply {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) add(Manifest.permission.POST_NOTIFICATIONS)
                             }
                             permissionLauncher.launch(permissions.toTypedArray())
                         }
@@ -167,11 +191,7 @@ fun MainScreen(
             }
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             if (recordings.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("No recordings yet")
@@ -179,26 +199,17 @@ fun MainScreen(
             } else {
                 LazyColumn {
                     items(recordings) { recording ->
-                        val isSelected = selectedIds.contains(recording.id)
-                        val isPlaying = playbackState == recording.id
                         RecordingItem(
                             recording = recording,
                             isSelectionMode = isSelectionMode,
-                            isSelected = isSelected,
-                            isPlaying = isPlaying, // Pass playing state
+                            isSelected = selectedIds.contains(recording.id),
+                            isPlaying = playbackState == recording.id,
                             onDelete = { viewModel.deleteRecording(it) },
-                            onRename = {
-                                recordingToRename = it
-                                showRenameDialog = true
-                            },
+                            onRename = { recordingToRename = it; showRenameDialog = true },
                             onShare = { viewModel.shareRecording(it) },
                             onLongClick = { viewModel.toggleSelection(recording.id) },
                             onClick = {
-                                if (isSelectionMode) {
-                                    viewModel.toggleSelection(recording.id)
-                                } else {
-                                    viewModel.playRecording(recording) // Use new play action
-                                }
+                                if (isSelectionMode) viewModel.toggleSelection(recording.id) else viewModel.playRecording(recording)
                             }
                         )
                     }
@@ -206,158 +217,4 @@ fun MainScreen(
             }
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun RecordingItem(
-    recording: Recording,
-    isSelectionMode: Boolean,
-    isSelected: Boolean,
-    isPlaying: Boolean,
-    onDelete: (Recording) -> Unit,
-    onRename: (Recording) -> Unit,
-    onShare: (Recording) -> Unit,
-    onLongClick: () -> Unit,
-    onClick: () -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
-        colors = if (isSelected) 
-            CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-        else 
-            CardDefaults.cardColors()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            if (isSelectionMode) {
-                Checkbox(
-                    checked = isSelected,
-                    onCheckedChange = { onClick() }
-                )
-            }
-            
-            Column(modifier = Modifier.weight(1f).padding(8.dp)) {
-                Text(text = recording.fileName, style = MaterialTheme.typography.bodyLarge)
-                Text(text = "Date: ${Date(recording.createdAt)}", style = MaterialTheme.typography.labelSmall)
-                if (isPlaying) {
-                    PlaybackVisualizer(modifier = Modifier.height(24.dp).width(48.dp))
-                }
-            }
-            
-            if (!isSelectionMode) {
-                IconButton(onClick = onClick) {
-                     if (isPlaying) {
-                        Icon(Icons.Default.Stop, contentDescription = "Stop")
-                     } else {
-                         Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
-                     }
-                 }
-
-                IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "More")
-                }
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text("Share") },
-                        onClick = { expanded = false; onShare(recording) }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Rename") },
-                        onClick = { expanded = false; onRename(recording) }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Delete") },
-                        onClick = { expanded = false; onDelete(recording) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PlaybackVisualizer(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "visualizer")
-    
-    // Animate 3 bars with different offsets
-    val scale1 by infiniteTransition.animateFloat(
-        initialValue = 0.2f,
-        targetValue = 0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500, easing = androidx.compose.animation.core.LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar1"
-    )
-    val scale2 by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1.0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(400, delayMillis = 100, easing = androidx.compose.animation.core.LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar2"
-    )
-    val scale3 by infiniteTransition.animateFloat(
-        initialValue = 0.4f,
-        targetValue = 0.7f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(600, delayMillis = 50, easing = androidx.compose.animation.core.LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar3"
-    )
-
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Bar(scale = scale1, color = MaterialTheme.colorScheme.primary)
-        Bar(scale = scale2, color = MaterialTheme.colorScheme.primary)
-        Bar(scale = scale3, color = MaterialTheme.colorScheme.primary)
-    }
-}
-
-@Composable
-fun Bar(scale: Float, color: Color) {
-    Box(
-        modifier = Modifier
-            .width(6.dp)
-            .fillMaxHeight(fraction = scale)
-            .background(color, shape = androidx.compose.foundation.shape.CircleShape)
-    )
-}
-
-@Composable
-fun RenameDialog(recording: Recording, onDismiss: () -> Unit, onRename: (String) -> Unit) {
-    var text by remember { mutableStateOf(recording.fileName.removeSuffix(".m4a")) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Rename Recording") },
-        text = {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                label = { Text("Name") }
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { onRename(text) }) { Text("Rename") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
-        }
-    )
 }

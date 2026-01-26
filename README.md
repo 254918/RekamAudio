@@ -24,7 +24,7 @@ Unlike traditional recorders that use the microphone, Rekam Audio taps directly 
 ## ✨ Key Features (English)
 
 *   **📱 Pure Internal Audio**
-    *   Records system sound directly (YouTube, Video, Zoom).
+    *   Records system sound directly (**Zoom, YouTube, Podcasts, Webinars**).
     *   No microphone interference or background noise.
     *   **Note:** Requires Android 10+ (API 29).
 

@@ -36,7 +36,9 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew app:assembleRelease
+        run: |
+          chmod +x gradlew
+          ./gradlew app:assembleRelease
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1

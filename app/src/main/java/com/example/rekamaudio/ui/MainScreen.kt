@@ -98,16 +98,16 @@ fun MainScreen(
 
     BackHandler(enabled = isSelectionMode) { viewModel.clearSelection() }
 
-    var showRenameDialog by remember { mutableStateOf(false) }
-    var recordingToRename by remember { mutableStateOf<Recording?>(null) }
+    val (showRenameDialog, setShowRenameDialog) = remember { mutableStateOf(false) }
+    val (recordingToRename, setRecordingToRename) = remember { mutableStateOf<Recording?>(null) }
 
     if (showRenameDialog && recordingToRename != null) {
         RenameDialog(
-            recording = recordingToRename!!,
-            onDismiss = { showRenameDialog = false },
+            recording = recordingToRename,
+            onDismiss = { setShowRenameDialog(false) },
             onRename = { 
-                viewModel.renameRecording(recordingToRename!!, it)
-                showRenameDialog = false
+                viewModel.renameRecording(recordingToRename, it)
+                setShowRenameDialog(false)
             }
         )
     }
@@ -206,7 +206,7 @@ fun MainScreen(
                             isSelected = selectedIds.contains(recording.id),
                             isPlaying = playbackState == recording.id,
                             onDelete = { viewModel.deleteRecording(it) },
-                            onRename = { recordingToRename = it; showRenameDialog = true },
+                            onRename = { setRecordingToRename(it); setShowRenameDialog(true) },
                             onShare = { viewModel.shareRecording(it) },
                             onLongClick = { viewModel.toggleSelection(recording.id) },
                             onClick = {

@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
@@ -33,10 +32,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 
 @AndroidEntryPoint
 class AudioCaptureService : Service() {
@@ -58,7 +57,7 @@ class AudioCaptureService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        mediaProjectionManager = getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         overlayManager = OverlayManager(this)
     }
 
@@ -223,7 +222,7 @@ class AudioCaptureService : Service() {
                 }
 
                 recordingJob = launch {
-                    encodeAndSaveAudio(bufferSize, sampleRate, 2)
+                    encodeAndSaveAudio(bufferSize)
                 }
             } catch (e: Exception) {
                 Log.e("AudioCaptureService", "Error starting recording", e)
@@ -236,7 +235,7 @@ class AudioCaptureService : Service() {
         }
     }
 
-    private suspend fun encodeAndSaveAudio(bufferSize: Int, sampleRate: Int, channelCount: Int) {
+    private fun encodeAndSaveAudio(bufferSize: Int) {
         val uri = createMediaStoreEntry() ?: return
         currentFileUri = uri
         
@@ -248,7 +247,7 @@ class AudioCaptureService : Service() {
 
             // Setup MediaCodec setup (AAC Encoder)
             val mimeType = MediaFormat.MIMETYPE_AUDIO_AAC
-            val format = MediaFormat.createAudioFormat(mimeType, sampleRate, channelCount)
+            val format = MediaFormat.createAudioFormat(mimeType, SAMPLE_RATE, CHANNEL_COUNT)
             format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
             format.setInteger(MediaFormat.KEY_BIT_RATE, 192000) // 192kbps
             format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 16384)
@@ -281,7 +280,7 @@ class AudioCaptureService : Service() {
                              if (i + 1 < readResult) {
                                   // Convert 2 bytes to 16-bit sample (Little Endian)
                                   val sample = ((inputBuffer[i+1].toInt() shl 8) or (inputBuffer[i].toInt() and 0xFF)).toShort()
-                                  val absSample = Math.abs(sample.toInt())
+                                  val absSample = abs(sample.toInt())
                                   if (absSample > maxAmp) maxAmp = absSample
                              }
                          }
@@ -298,7 +297,7 @@ class AudioCaptureService : Service() {
                         // Calculate PTS based on samples processed
                         // PTS (us) = (TotalSamples / SampleRate) * 1,000,000
                         // TotalSamples = TotalBytes / (ChannelCount * 2 bytes/sample)
-                        val presentationTimeUs = (totalBytesRead * 1_000_000) / (sampleRate * channelCount * 2)
+                        val presentationTimeUs = (totalBytesRead * 1_000_000) / (SAMPLE_RATE * CHANNEL_COUNT * 2)
                         
                         mediaCodec?.queueInputBuffer(
                             inputBufferIndex,
@@ -316,7 +315,7 @@ class AudioCaptureService : Service() {
                 var outputBufferIndex = mediaCodec?.dequeueOutputBuffer(bufferInfo, 0) ?: -1
                 while (outputBufferIndex >= 0) {
                     if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
-                        // bufferInfo.size = 0
+                        bufferInfo.size = 0
                     }
 
                     if (bufferInfo.size != 0) {
@@ -365,28 +364,21 @@ class AudioCaptureService : Service() {
         val values = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp4a-latm")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/RekamAudio")
-                put(MediaStore.Audio.Media.IS_PENDING, 1)
-            }
+            put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/RekamAudio")
+            put(MediaStore.Audio.Media.IS_PENDING, 1)
         }
         
-        val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val collection =
             MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        } else {
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        }
-        
+
         return contentResolver.insert(collection, values)
     }
 
     private fun finalizeMediaStoreEntry(uri: Uri) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val values = ContentValues().apply {
-                put(MediaStore.Audio.Media.IS_PENDING, 0)
-            }
-            contentResolver.update(uri, values, null, null)
+        val values = ContentValues().apply {
+            put(MediaStore.Audio.Media.IS_PENDING, 0)
         }
+        contentResolver.update(uri, values, null, null)
     }
 
     private fun stopRecording() {
@@ -439,5 +431,7 @@ class AudioCaptureService : Service() {
         const val ACTION_DISMISS_OVERLAY = "DISMISS_OVERLAY" // New Action
         const val EXTRA_RESULT_CODE = "RESULT_CODE"
         const val EXTRA_RESULT_DATA = "RESULT_DATA"
+        const val SAMPLE_RATE = 48000
+        const val CHANNEL_COUNT = 2
     }
 }

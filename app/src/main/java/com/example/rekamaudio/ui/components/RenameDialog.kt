@@ -13,14 +13,14 @@ fun RenameDialog(
     onDismiss: () -> Unit,
     onRename: (String) -> Unit
 ) {
-    var text by remember { mutableStateOf(recording.fileName.removeSuffix(".m4a")) }
+    val (text, setText) = remember(recording.fileName) { mutableStateOf(recording.fileName.removeSuffix(".m4a")) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Rename Recording") },
         text = {
             OutlinedTextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = setText,
                 label = { Text("Name") }
             )
         },

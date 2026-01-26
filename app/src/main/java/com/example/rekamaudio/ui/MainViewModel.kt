@@ -66,13 +66,7 @@ class MainViewModel @Inject constructor(
         audioPlayer.release()
     }
 
-    fun startRecordingService(resultCode: Int, data: Intent) {
-        stopPlayback()
-        viewModelScope.launch {
-            _events.emit(MainEvent.StartRecordingService(resultCode, data))
-            _uiState.value = RecordingUiState.Recording
-        }
-    }
+
 
     fun startOverlayService(resultCode: Int, data: Intent) {
         stopPlayback()

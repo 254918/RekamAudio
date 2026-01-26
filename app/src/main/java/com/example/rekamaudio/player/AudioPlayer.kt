@@ -2,14 +2,14 @@ package com.example.rekamaudio.player
 
 import android.content.Context
 import android.media.MediaPlayer
-import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.net.toUri
 
 @Singleton
 class AudioPlayer @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
 
     private var mediaPlayer: MediaPlayer? = null
@@ -19,7 +19,7 @@ class AudioPlayer @Inject constructor(
         
         mediaPlayer = MediaPlayer().apply {
             try {
-                setDataSource(context, Uri.parse(uri))
+                setDataSource(context, uri.toUri())
                 prepare()
                 start()
                 setOnCompletionListener { 

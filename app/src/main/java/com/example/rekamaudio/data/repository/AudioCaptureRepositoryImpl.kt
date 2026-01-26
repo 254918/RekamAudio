@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import java.io.File
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 class AudioCaptureRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : AudioCaptureRepository {
 
     override fun getRecordings(): Flow<List<Recording>> = callbackFlow {
@@ -33,12 +33,9 @@ class AudioCaptureRepositoryImpl @Inject constructor(
         trySend(queryRecordings())
 
         // Register observer
-        val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        val collection =
             MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-        } else {
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        }
-        
+
         context.contentResolver.registerContentObserver(collection, true, observer)
 
         awaitClose {
@@ -59,11 +56,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
         
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
-        val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+        val collection =
             MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-        } else {
-             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        }
 
         context.contentResolver.query(
             collection,
@@ -108,7 +102,7 @@ class AudioCaptureRepositoryImpl @Inject constructor(
 
     override suspend fun deleteRecording(recording: Recording): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val uri = Uri.parse(recording.fileUri)
+            val uri = recording.fileUri.toUri()
             val rowsDeleted = context.contentResolver.delete(uri, null, null)
             if (rowsDeleted > 0) {
                 Result.success(true)
@@ -122,7 +116,7 @@ class AudioCaptureRepositoryImpl @Inject constructor(
 
     override suspend fun renameRecording(recording: Recording, newName: String): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val uri = Uri.parse(recording.fileUri)
+            val uri = recording.fileUri.toUri()
             val finalName = if (newName.endsWith(".m4a")) newName else "$newName.m4a"
             
             val contentValues = android.content.ContentValues().apply {

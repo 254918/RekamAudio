@@ -23,6 +23,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
 
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -72,7 +73,7 @@ fun MainScreen(
                 is MainEvent.ShareRecording -> {
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {
                         type = "audio/*"
-                        putExtra(Intent.EXTRA_STREAM, android.net.Uri.parse(event.uri))
+                        putExtra(Intent.EXTRA_STREAM, event.uri.toUri())
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
                     context.startActivity(Intent.createChooser(shareIntent, "Share Recording"))
@@ -82,7 +83,7 @@ fun MainScreen(
                         type = "audio/*"
                         putParcelableArrayListExtra(
                             Intent.EXTRA_STREAM,
-                            ArrayList(event.uris.map { android.net.Uri.parse(it) })
+                            ArrayList(event.uris.map { it.toUri() })
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
@@ -134,7 +135,7 @@ fun MainScreen(
              if (!android.provider.Settings.canDrawOverlays(context)) {
                  overlayPermissionLauncher.launch(Intent(
                      android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                     android.net.Uri.parse("package:${context.packageName}")
+                     "package:${context.packageName}".toUri()
                  ))
                  return@rememberLauncherForActivityResult
              }

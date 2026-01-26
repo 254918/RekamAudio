@@ -90,7 +90,7 @@ class AudioCaptureRepositoryImpl @Inject constructor(
 
                 // Only include m4a files from our app
                 // Ideally this should use relative path check for reliability but name check works for simple scenarios
-                if (name.endsWith(".m4a") && name.startsWith("recording_")) {
+                if (name.endsWith(".m4a")) {
                      recordings.add(
                         Recording(
                             id = id,

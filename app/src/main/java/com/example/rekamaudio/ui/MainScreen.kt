@@ -325,8 +325,8 @@ fun PlaybackVisualizer(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Bar(scale = scale1, color = MaterialTheme.colorScheme.primary)
-        Bar(scale = scale2, color = Color.LightGray)
-        Bar(scale = scale3, color = Color.LightGray)
+        Bar(scale = scale2, color = MaterialTheme.colorScheme.primary)
+        Bar(scale = scale3, color = MaterialTheme.colorScheme.primary)
     }
 }
 

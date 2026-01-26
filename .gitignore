@@ -1,15 +1,43 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+# Built artifacts
+build/
 /build
-/captures
+*.apk
+*.aar
+*.jks
+*.keystore
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+.idea/workspace.xml
+.idea/libraries
+.idea/modules.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/caches/
+
+# Local configuration
+local.properties
+/local.properties
+
+# Gradle
+.gradle/
+build/
+
+# Kotlin
+.kotlin/
+kotlin-daemon-embeddable-*.jar
+
+# AI Agent Context
+.agent/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Misc
+log.txt
+captures/
 .externalNativeBuild
 .cxx
-local.properties

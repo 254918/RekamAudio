@@ -9,6 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,6 +61,20 @@ fun RecordingItem(
                 )
             }
             
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer, shape = androidx.compose.foundation.shape.CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MusicNote,
+                    contentDescription = "Recording",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
             Column(modifier = Modifier.weight(1f).padding(8.dp)) {
                 Text(text = recording.fileName, style = MaterialTheme.typography.bodyLarge)
                 Text(text = "Date: ${Date(recording.createdAt)}", style = MaterialTheme.typography.labelSmall)
@@ -79,15 +97,18 @@ fun RecordingItem(
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(
                         text = { Text("Share") },
-                        onClick = { expanded = false; onShare(recording) }
+                        onClick = { expanded = false; onShare(recording) },
+                        leadingIcon = { Icon(Icons.Default.Share, contentDescription = null) }
                     )
                     DropdownMenuItem(
                         text = { Text("Rename") },
-                        onClick = { expanded = false; onRename(recording) }
+                        onClick = { expanded = false; onRename(recording) },
+                        leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
                     )
                     DropdownMenuItem(
                         text = { Text("Delete") },
-                        onClick = { expanded = false; onDelete(recording) }
+                        onClick = { expanded = false; onDelete(recording) },
+                        leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) }
                     )
                 }
             }

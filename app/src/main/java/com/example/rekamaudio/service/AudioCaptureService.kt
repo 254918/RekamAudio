@@ -232,6 +232,11 @@ class AudioCaptureService : Service() {
 
                 audioRecord?.startRecording()
                 isRecording = true
+                getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(KEY_IS_RECORDING, true)
+                    .apply()
+
                 Log.d("AudioCaptureService", "AudioRecord started successfully")
                 
                 withContext(Dispatchers.Main) {
@@ -478,6 +483,11 @@ class AudioCaptureService : Service() {
 
     private fun stopRecording() {
         isRecording = false
+        getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_IS_RECORDING, false)
+            .apply()
+
         recordingJob?.cancel()
         
         try {
@@ -529,5 +539,8 @@ class AudioCaptureService : Service() {
         const val SAMPLE_RATE = 48000
         const val CHANNEL_COUNT = 2
         const val EXTRA_AUDIO_QUALITY = "AUDIO_QUALITY"
+        
+        const val PREFS_NAME = "rekam_audio_prefs"
+        const val KEY_IS_RECORDING = "is_recording"
     }
 }

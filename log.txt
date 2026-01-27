@@ -1,8 +1,0 @@
-> Task :app:compileDebugKotlin
-e: file:///C:/Users/fulan/AndroidStudioProjects/RekamAudio/app/src/main/java/com/example/rekamaudio/MainActivity.kt:23:49 Unresolved reference 'composable'.
-e: file:///C:/Users/fulan/AndroidStudioProjects/RekamAudio/app/src/main/java/com/example/rekamaudio/MainActivity.kt:24:25 @Composable invocations can only happen from the context of a @Composable function
-e: file:///C:/Users/fulan/AndroidStudioProjects/RekamAudio/app/src/main/java/com/example/rekamaudio/MainActivity.kt:28:49 Unresolved reference 'composable'.
-e: file:///C:/Users/fulan/AndroidStudioProjects/RekamAudio/app/src/main/java/com/example/rekamaudio/MainActivity.kt:29:51 @Composable invocations can only happen from the context of a @Composable function
-
-> Task :app:compileDebugKotlin FAILED
-

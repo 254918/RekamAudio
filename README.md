@@ -64,8 +64,7 @@ Unlike traditional recorders that use the microphone, Rekam Audio taps directly 
 ## ⚠️ Known Issues / Masalah yang Diketahui
 
 *   **Google Chrome & Web Browsers:** Chrome on Android generally blocks internal audio capture (except via Microphone). This is a system-level restriction by Google.
-    *   **Recommendation:** Use **Samsung Internet** or **Firefox** for better compatibility with internal audio recording.
-*   **Voice Calls (WhatsApp, Zoom, Meet):** Recording internal audio of voice calls is blocked by Android for privacy/security reasons.
+    *   **Recommendation:** Use other browsers like **Samsung Internet** or **Firefox** for better compatibility with internal audio recording.
 
 
 ## 🤝 Contributing

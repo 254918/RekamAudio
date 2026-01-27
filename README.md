@@ -1,9 +1,9 @@
-# Rekam Audio - Internal Audio Recorder (Perekam Suara Internal)
+# Rekam Audio - Internal Audio Recorder (Perekam Audio Internal)
 
 ![Android](https://img.shields.io/badge/Android-10%2B-green.svg) ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
 **Rekam Audio** is a modern, privacy-focused Android application designed to capture **internal system audio** with high fidelity.
-*(Aplikasi perekam suara internal Android yang jernih, tanpa root, dan privasi aman.)*
+*(Aplikasi perekam audio internal Android yang jernih, tanpa root, dan privasi aman.)*
 
 Unlike traditional recorders that use the microphone, Rekam Audio taps directly into the system's audio stream, ensuring crystal-clear recordings without background noise. Perfect for recording **Zoom meetings, Webinars, YouTube videos, or Podcasts**.
 

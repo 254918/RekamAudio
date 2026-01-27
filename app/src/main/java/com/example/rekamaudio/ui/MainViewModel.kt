@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rekamaudio.data.model.Recording
 import com.example.rekamaudio.data.repository.AudioCaptureRepository
+import com.example.rekamaudio.data.repository.SettingsRepository
 import com.example.rekamaudio.player.AudioPlayer
 import com.example.rekamaudio.service.AudioCaptureService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: AudioCaptureRepository,
+    private val settingsRepository: SettingsRepository,
     private val audioPlayer: AudioPlayer
 ) : ViewModel() {
 
@@ -71,7 +73,8 @@ class MainViewModel @Inject constructor(
     fun startOverlayService(resultCode: Int, data: Intent) {
         stopPlayback()
         viewModelScope.launch {
-            _events.emit(MainEvent.StartOverlayService(resultCode, data))
+            val quality = settingsRepository.audioQuality.first()
+            _events.emit(MainEvent.StartOverlayService(resultCode, data, quality))
         }
     }
 

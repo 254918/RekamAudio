@@ -2,6 +2,8 @@ package com.example.rekamaudio.di
 
 import com.example.rekamaudio.data.repository.AudioCaptureRepository
 import com.example.rekamaudio.data.repository.AudioCaptureRepositoryImpl
+import com.example.rekamaudio.data.repository.SettingsRepository
+import com.example.rekamaudio.data.repository.SettingsRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,4 +19,10 @@ abstract class AppModule {
     abstract fun bindAudioCaptureRepository(
         impl: AudioCaptureRepositoryImpl
     ): AudioCaptureRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 }

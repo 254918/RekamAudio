@@ -36,6 +36,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
+import com.example.rekamaudio.data.model.AudioQuality
+import java.io.FileOutputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
+import android.media.AudioFormat.CHANNEL_IN_STEREO
+import android.media.AudioFormat.ENCODING_PCM_16BIT
 
 @AndroidEntryPoint
 class AudioCaptureService : Service() {
@@ -48,6 +55,7 @@ class AudioCaptureService : Service() {
     private var recordingJob: Job? = null
     private var isRecording = false
     private var currentFileUri: Uri? = null
+    private var audioQuality: AudioQuality = AudioQuality.MEDIUM_QUALITY_M4A
 
     private lateinit var overlayManager: OverlayManager
     private var savedResultCode: Int = 0
@@ -103,6 +111,15 @@ class AudioCaptureService : Service() {
                 if (resultCode != 0 && resultData != null) {
                     savedResultCode = resultCode
                     savedResultData = resultData
+                }
+                
+                val qualityName = intent.getStringExtra(EXTRA_AUDIO_QUALITY)
+                if (qualityName != null) {
+                    try {
+                        audioQuality = AudioQuality.valueOf(qualityName)
+                    } catch (e: Exception) {
+                        Log.e("AudioCaptureService", "Invalid AudioQuality: $qualityName")
+                    }
                 }
                 
                 startForegroundServiceNotification()
@@ -222,7 +239,11 @@ class AudioCaptureService : Service() {
                 }
 
                 recordingJob = launch {
-                    encodeAndSaveAudio(bufferSize)
+                    if (audioQuality == AudioQuality.HIGH_QUALITY_WAV) {
+                        recordWavAudio(bufferSize)
+                    } else {
+                        recordAacAudio(bufferSize)
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("AudioCaptureService", "Error starting recording", e)
@@ -235,8 +256,8 @@ class AudioCaptureService : Service() {
         }
     }
 
-    private fun encodeAndSaveAudio(bufferSize: Int) {
-        val uri = createMediaStoreEntry() ?: return
+    private fun recordAacAudio(bufferSize: Int) {
+        val uri = createMediaStoreEntry(isWav = false) ?: return
         currentFileUri = uri
         
         var pfd: ParcelFileDescriptor? = null
@@ -347,7 +368,11 @@ class AudioCaptureService : Service() {
                 mediaMuxer?.stop()
                 mediaMuxer?.release()
                 pfd?.close()
-                finalizeMediaStoreEntry(uri)
+                if (isRecording) { // If stopped properly, otherwise maybe error
+                    finalizeMediaStoreEntry(uri)
+                } else {
+                     finalizeMediaStoreEntry(uri)
+                }
             } catch (e: Exception) {
                 Log.e("AudioCaptureService", "Error releasing resources", e)
             }
@@ -357,13 +382,83 @@ class AudioCaptureService : Service() {
         }
     }
 
-    private fun createMediaStoreEntry(): Uri? {
+    private fun recordWavAudio(bufferSize: Int) {
+        val uri = createMediaStoreEntry(isWav = true) ?: return
+        currentFileUri = uri
+        
+        var pfd: ParcelFileDescriptor? = null
+        var outputStream: FileOutputStream? = null
+        
+        try {
+            pfd = contentResolver.openFileDescriptor(uri, "w")
+            val fd = pfd?.fileDescriptor ?: return
+            outputStream = FileOutputStream(fd)
+            val channel = outputStream.channel
+
+            // Write 44 bytes placeholder header
+            val header = ByteArray(44)
+            outputStream.write(header)
+
+            val buffer = ByteArray(bufferSize)
+            var totalBytesRead = 0L
+            
+            while (isRecording) {
+                val readResult = audioRecord?.read(buffer, 0, bufferSize) ?: 0
+                if (readResult > 0) {
+                    outputStream.write(buffer, 0, readResult)
+                    totalBytesRead += readResult.toLong()
+                }
+            }
+            
+            // Go back and write real header
+            channel.position(0)
+            writeWavHeader(channel, totalBytesRead, SAMPLE_RATE, CHANNEL_COUNT)
+            
+        } catch (e: Exception) {
+             Log.e("AudioCaptureService", "Error recording WAV", e)
+        } finally {
+            try {
+                outputStream?.close()
+                pfd?.close()
+                finalizeMediaStoreEntry(uri)
+            } catch (e: Exception) {
+                Log.e("AudioCaptureService", "Error closing resources", e)
+            }
+        }
+    }
+
+    private fun writeWavHeader(channel: FileChannel, totalAudioLen: Long, sampleRate: Int, channels: Int) {
+        val totalDataLen = totalAudioLen + 36
+        val byteRate = (sampleRate * channels * 16 / 8).toLong()
+        
+        val header = ByteArray(44)
+        val buffer = ByteBuffer.wrap(header).order(ByteOrder.LITTLE_ENDIAN)
+
+        buffer.put("RIFF".toByteArray())
+        buffer.putInt(totalDataLen.toInt())
+        buffer.put("WAVE".toByteArray())
+        buffer.put("fmt ".toByteArray())
+        buffer.putInt(16) // Subchunk1Size
+        buffer.putShort(1) // AudioFormat 1 = PCM
+        buffer.putShort(channels.toShort())
+        buffer.putInt(sampleRate)
+        buffer.putInt(byteRate.toInt())
+        buffer.putShort((channels * 16 / 8).toShort()) // BlockAlign
+        buffer.putShort(16) // BitsPerSample
+        buffer.put("data".toByteArray())
+        buffer.putInt(totalAudioLen.toInt())
+        
+        channel.write(ByteBuffer.wrap(header))
+    }
+
+    private fun createMediaStoreEntry(isWav: Boolean): Uri? {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileName = "recording_$timestamp.m4a"
+        val fileName = if (isWav) "recording_$timestamp.wav" else "recording_$timestamp.m4a"
+        val mimeType = if (isWav) "audio/wav" else "audio/mp4a-latm"
         
         val values = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp4a-latm")
+            put(MediaStore.Audio.Media.MIME_TYPE, mimeType)
             put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/RekamAudio")
             put(MediaStore.Audio.Media.IS_PENDING, 1)
         }
@@ -433,5 +528,6 @@ class AudioCaptureService : Service() {
         const val EXTRA_RESULT_DATA = "RESULT_DATA"
         const val SAMPLE_RATE = 48000
         const val CHANNEL_COUNT = 2
+        const val EXTRA_AUDIO_QUALITY = "AUDIO_QUALITY"
     }
 }

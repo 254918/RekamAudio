@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.*
@@ -35,6 +36,7 @@ import com.example.rekamaudio.ui.components.RenameDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    onSettingsClick: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -53,6 +55,7 @@ fun MainScreen(
                         action = AudioCaptureService.ACTION_START
                         putExtra(AudioCaptureService.EXTRA_RESULT_CODE, event.resultCode)
                         putExtra(AudioCaptureService.EXTRA_RESULT_DATA, event.data)
+                        putExtra(AudioCaptureService.EXTRA_AUDIO_QUALITY, event.quality.name)
                     }
                     context.startForegroundService(intent)
                 }
@@ -61,6 +64,7 @@ fun MainScreen(
                         action = AudioCaptureService.ACTION_SHOW_OVERLAY
                         putExtra(AudioCaptureService.EXTRA_RESULT_CODE, event.resultCode)
                         putExtra(AudioCaptureService.EXTRA_RESULT_DATA, event.data)
+                        putExtra(AudioCaptureService.EXTRA_AUDIO_QUALITY, event.quality.name)
                     }
                     context.startForegroundService(intent)
                 }
@@ -166,7 +170,14 @@ fun MainScreen(
                     }
                 )
             } else {
-                TopAppBar(title = { Text("Rekam Audio") })
+                TopAppBar(
+                    title = { Text("Rekam Audio") },
+                    actions = {
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                        }
+                    }
+                )
             }
         },
         floatingActionButton = {

@@ -61,6 +61,13 @@ Unlike traditional recorders that use the microphone, Rekam Audio taps directly 
 2.  Install on your Android device (Android 10 or newer required).
 3.  Grant the necessary permissions (Notification for controls, Overlay for the floating button).
 
+## ⚠️ Known Issues / Masalah yang Diketahui
+
+*   **Google Chrome & Web Browsers:** Chrome on Android generally blocks internal audio capture (except via Microphone). This is a system-level restriction by Google.
+    *   **Recommendation:** Use **Samsung Internet** or **Firefox** for better compatibility with internal audio recording.
+*   **Voice Calls (WhatsApp, Zoom, Meet):** Recording internal audio of voice calls is blocked by Android for privacy/security reasons.
+
+
 ## 🤝 Contributing
 Contributions are welcome! Please open an issue or submit a pull request if you have suggestions or bug fixes.
 

@@ -51,9 +51,10 @@ class AudioCaptureRepositoryImpl @Inject constructor(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DATE_ADDED
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.RELATIVE_PATH
         )
-        
+
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
 
         val collection =
@@ -70,21 +71,26 @@ class AudioCaptureRepositoryImpl @Inject constructor(
             val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
             val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+            val pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.RELATIVE_PATH)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val name = cursor.getString(nameColumn)
                 val duration = cursor.getLong(durationColumn)
                 val dateAdded = cursor.getLong(dateAddedColumn)
+                val relativePath = cursor.getString(pathColumn)
 
                 val contentUri: Uri = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     id
                 )
 
-                // Only include m4a files from our app
-                // Ideally this should use relative path check for reliability but name check works for simple scenarios
-                if (name.endsWith(".m4a")) {
+                // Only include files written by our app (Music/RekamAudio) with a supported extension
+                val isSupportedFormat = name.endsWith(".m4a") ||
+                    name.endsWith(".wav") ||
+                    name.endsWith(".mp3")
+
+                if (isSupportedFormat && relativePath.contains("RekamAudio")) {
                      recordings.add(
                         Recording(
                             id = id,
@@ -117,7 +123,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
     override suspend fun renameRecording(recording: Recording, newName: String): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val uri = recording.fileUri.toUri()
-            val finalName = if (newName.endsWith(".m4a")) newName else "$newName.m4a"
+            val extension = recording.fileName.substringAfterLast('.', "m4a")
+            val finalName = if (newName.endsWith(".$extension")) newName else "$newName.$extension"
             
             val contentValues = android.content.ContentValues().apply {
                 put(MediaStore.Audio.Media.DISPLAY_NAME, finalName)

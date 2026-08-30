@@ -41,9 +41,11 @@
     <string name="audio_quality">音訊品質</string>
     <string name="high_quality_wav">高品質 (WAV)</string>
     <string name="medium_quality_m4a">中等品質 (M4A)</string>
+    <string name="compatible_quality_mp3">MP3 (192kbps)</string>
     <string name="choose_audio_quality">選擇音訊品質</string>
     <string name="high_quality_desc">高 (WAV) – 無壓縮</string>
     <string name="medium_quality_desc">中 (M4A) – 壓縮格式</string>
+    <string name="compatible_quality_desc">MP3 – 通用相容格式（停止後需片刻編碼）</string>
     <string name="confirm">確定</string>
     <string name="cancel">取消</string>
 

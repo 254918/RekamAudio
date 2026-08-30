@@ -25,6 +25,8 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.arthenica.ffmpegkit.FFmpegKit
+import com.arthenica.ffmpegkit.ReturnCode
 import com.example.rekamaudio.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +39,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.abs
 import com.example.rekamaudio.data.model.AudioQuality
+import java.io.File
 import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -244,10 +247,10 @@ class AudioCaptureService : Service() {
                 }
 
                 recordingJob = launch {
-                    if (audioQuality == AudioQuality.HIGH_QUALITY_WAV) {
-                        recordWavAudio(bufferSize)
-                    } else {
-                        recordAacAudio(bufferSize)
+                    when (audioQuality) {
+                        AudioQuality.HIGH_QUALITY_WAV -> recordWavAudio(bufferSize)
+                        AudioQuality.COMPATIBLE_QUALITY_MP3 -> recordMp3Audio(bufferSize)
+                        AudioQuality.MEDIUM_QUALITY_M4A -> recordAacAudio(bufferSize)
                     }
                 }
             } catch (e: Exception) {
@@ -429,6 +432,76 @@ class AudioCaptureService : Service() {
             } catch (e: Exception) {
                 Log.e("AudioCaptureService", "Error closing resources", e)
             }
+        }
+    }
+
+    /**
+     * Records raw PCM to a temp file while recording, then encodes it to MP3
+     * with ffmpeg (libmp3lame) after stopping and imports the result into MediaStore.
+     */
+    private fun recordMp3Audio(bufferSize: Int) {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val pcmFile = File(cacheDir, "rekam_tmp_$timestamp.pcm")
+        val mp3File = File(cacheDir, "rekam_tmp_$timestamp.mp3")
+
+        try {
+            FileOutputStream(pcmFile).use { outputStream ->
+                val buffer = ByteArray(bufferSize)
+                while (isRecording) {
+                    val readResult = audioRecord?.read(buffer, 0, bufferSize) ?: 0
+                    if (readResult > 0) {
+                        outputStream.write(buffer, 0, readResult)
+                    }
+                }
+            }
+
+            // Encode PCM -> MP3 (192 kbps). Blocking call, immune to coroutine cancellation,
+            // so the encode always finishes even though stopRecording() cancels the job.
+            val command = "-y -f s16le -ar $SAMPLE_RATE -ac $CHANNEL_COUNT " +
+                "-i ${pcmFile.absolutePath} -codec:a libmp3lame -b:a 192k ${mp3File.absolutePath}"
+            val session = FFmpegKit.execute(command)
+
+            if (!ReturnCode.isSuccess(session.returnCode)) {
+                Log.e("AudioCaptureService", "MP3 encode failed: rc=${session.returnCode} ${session.getAllLogsAsString()}")
+                return
+            }
+
+            copyFileToMediaStore(mp3File, "recording_$timestamp.mp3", "audio/mpeg")
+        } catch (e: Exception) {
+            Log.e("AudioCaptureService", "Error recording MP3", e)
+        } finally {
+            pcmFile.delete()
+            mp3File.delete()
+        }
+    }
+
+    private fun copyFileToMediaStore(file: File, fileName: String, mimeType: String) {
+        val values = ContentValues().apply {
+            put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Audio.Media.MIME_TYPE, mimeType)
+            put(MediaStore.Audio.Media.RELATIVE_PATH, "Music/RekamAudio")
+            put(MediaStore.Audio.Media.IS_PENDING, 1)
+        }
+
+        val collection =
+            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+
+        val uri = contentResolver.insert(collection, values) ?: run {
+            Log.e("AudioCaptureService", "Failed to create MediaStore entry for $fileName")
+            return
+        }
+
+        try {
+            contentResolver.openOutputStream(uri)?.use { out ->
+                file.inputStream().use { it.copyTo(out) }
+            }
+            val doneValues = ContentValues().apply {
+                put(MediaStore.Audio.Media.IS_PENDING, 0)
+            }
+            contentResolver.update(uri, doneValues, null, null)
+        } catch (e: Exception) {
+            Log.e("AudioCaptureService", "Failed to write $fileName to MediaStore", e)
+            contentResolver.delete(uri, null, null)
         }
     }
 

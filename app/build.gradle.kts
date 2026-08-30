@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.rekamaudio"
         minSdk = 29
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.ffmpeg.kit.audio)
     
     // Hilt
     implementation(libs.hilt.android)

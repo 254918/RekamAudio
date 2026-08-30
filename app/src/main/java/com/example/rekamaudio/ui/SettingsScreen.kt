@@ -87,6 +87,7 @@ fun SettingsScreen(
                 subtitle = when (currentQuality) {
                     AudioQuality.HIGH_QUALITY_WAV -> stringResource(R.string.high_quality_wav)
                     AudioQuality.MEDIUM_QUALITY_M4A -> stringResource(R.string.medium_quality_m4a)
+                    AudioQuality.COMPATIBLE_QUALITY_MP3 -> stringResource(R.string.compatible_quality_mp3)
                 },
                 onClick = { showQualityDialog = true }
             )
@@ -154,6 +155,7 @@ fun AudioQualityDialog(
                             text = when (quality) {
                                 AudioQuality.HIGH_QUALITY_WAV -> stringResource(R.string.high_quality_desc)
                                 AudioQuality.MEDIUM_QUALITY_M4A -> stringResource(R.string.medium_quality_desc)
+                                AudioQuality.COMPATIBLE_QUALITY_MP3 -> stringResource(R.string.compatible_quality_desc)
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 16.dp)

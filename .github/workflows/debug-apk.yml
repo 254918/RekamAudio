@@ -1,4 +1,4 @@
-name: Build Debug APK
+name: Build APK
 
 on:
   workflow_dispatch:
@@ -20,26 +20,35 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Build Debug APK
+      - name: Build APK
         run: |
           chmod +x gradlew
           ./gradlew app:assembleDebug
 
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk RekamAudio.apk
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rekam-audio-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: rekam-audio-apk
+          path: RekamAudio.apk
           retention-days: 7
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: debug-apk
-          name: Rekam Audio Debug APK
+          tag_name: apk
+          name: Rekam Audio
           body: |
-            Debug build for phone testing.
-            Download `app-debug.apk` below and install it on your Android device.
-          files: app/build/outputs/apk/debug/app-debug.apk
+            Rekam Audio APK (v1.1.0)
+
+            - Chinese localization (zh-CN / zh-TW)
+            - WAV / M4A / MP3 recording formats
+            - Playback seek bar
+            - Draggable floating record button
+
+            Download `RekamAudio.apk` below and install it on your Android device.
+          files: RekamAudio.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

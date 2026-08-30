@@ -41,9 +41,11 @@
     <string name="audio_quality">Audio Quality</string>
     <string name="high_quality_wav">High Quality (WAV)</string>
     <string name="medium_quality_m4a">Medium Quality (M4A)</string>
+    <string name="compatible_quality_mp3">MP3 (192kbps)</string>
     <string name="choose_audio_quality">Choose Audio Quality</string>
     <string name="high_quality_desc">High (WAV) – Uncompressed</string>
     <string name="medium_quality_desc">Medium (M4A) – Compressed</string>
+    <string name="compatible_quality_desc">MP3 – Universally compatible (needs a moment to encode after stopping)</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 

@@ -18,9 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.rekamaudio.R
 import com.example.rekamaudio.data.model.Recording
+import com.example.rekamaudio.player.PlaybackProgress
+import java.text.DateFormat
 import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -29,6 +34,8 @@ fun RecordingItem(
     isSelectionMode: Boolean,
     isSelected: Boolean,
     isPlaying: Boolean,
+    playbackProgress: PlaybackProgress,
+    onSeek: (Int) -> Unit,
     onDelete: (Recording) -> Unit,
     onRename: (Recording) -> Unit,
     onShare: (Recording) -> Unit,
@@ -36,6 +43,9 @@ fun RecordingItem(
     onClick: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val dateText = remember(recording.createdAt) {
+        DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()).format(Date(recording.createdAt))
+    }
 
     Card(
         modifier = Modifier
@@ -45,9 +55,9 @@ fun RecordingItem(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        colors = if (isSelected) 
+        colors = if (isSelected)
             CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-        else 
+        else
             CardDefaults.cardColors()
     ) {
         Row(
@@ -60,7 +70,7 @@ fun RecordingItem(
                     onCheckedChange = { onClick() }
                 )
             }
-            
+
             Box(
                 modifier = Modifier
                     .padding(8.dp)
@@ -70,43 +80,54 @@ fun RecordingItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.MusicNote,
-                    contentDescription = "Recording",
+                    contentDescription = stringResource(R.string.recording),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
 
             Column(modifier = Modifier.weight(1f).padding(8.dp)) {
                 Text(text = recording.fileName, style = MaterialTheme.typography.bodyLarge)
-                Text(text = "Date: ${Date(recording.createdAt)}", style = MaterialTheme.typography.labelSmall)
+                Text(
+                    text = stringResource(R.string.date_label, dateText),
+                    style = MaterialTheme.typography.labelSmall
+                )
                 if (isPlaying) {
-                    PlaybackVisualizer(modifier = Modifier.height(24.dp).width(48.dp))
+                    if (playbackProgress.durationMs > 0) {
+                        PlaybackProgressBar(
+                            progress = playbackProgress,
+                            onSeek = onSeek,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    } else {
+                        PlaybackVisualizer(modifier = Modifier.height(24.dp).width(48.dp))
+                    }
                 }
             }
-            
+
             if (!isSelectionMode) {
                 IconButton(onClick = onClick) {
                      Icon(
                          if (isPlaying) Icons.Default.Stop else Icons.Default.PlayArrow,
-                         contentDescription = if (isPlaying) "Stop" else "Play"
+                         contentDescription = stringResource(if (isPlaying) R.string.stop else R.string.play)
                      )
                  }
 
                 IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "More")
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more))
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     DropdownMenuItem(
-                        text = { Text("Share") },
+                        text = { Text(stringResource(R.string.share)) },
                         onClick = { expanded = false; onShare(recording) },
                         leadingIcon = { Icon(Icons.Default.Share, contentDescription = null) }
                     )
                     DropdownMenuItem(
-                        text = { Text("Rename") },
+                        text = { Text(stringResource(R.string.rename)) },
                         onClick = { expanded = false; onRename(recording) },
                         leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
                     )
                     DropdownMenuItem(
-                        text = { Text("Delete") },
+                        text = { Text(stringResource(R.string.delete)) },
                         onClick = { expanded = false; onDelete(recording) },
                         leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) }
                     )
@@ -117,9 +138,68 @@ fun RecordingItem(
 }
 
 @Composable
+fun PlaybackProgressBar(
+    progress: PlaybackProgress,
+    onSeek: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // While dragging we show the finger position; otherwise follow playback
+    var dragFraction by remember { mutableStateOf<Float?>(null) }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = formatDuration(if (dragFraction != null) {
+                (dragFraction!! * progress.durationMs).toInt()
+            } else progress.positionMs),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Slider(
+            value = dragFraction ?: progress.fraction,
+            onValueChange = { dragFraction = it },
+            onValueChangeFinished = {
+                dragFraction?.let { fraction ->
+                    onSeek((fraction * progress.durationMs).toInt())
+                }
+                dragFraction = null
+            },
+            modifier = Modifier
+                .weight(1f)
+                .height(28.dp)
+                .padding(horizontal = 8.dp),
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        )
+        Text(
+            text = formatDuration(progress.durationMs),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+private fun formatDuration(ms: Int): String {
+    val totalSeconds = ms / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return if (hours > 0) {
+        String.format(Locale.US, "%d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        String.format(Locale.US, "%d:%02d", minutes, seconds)
+    }
+}
+
+@Composable
 fun PlaybackVisualizer(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "visualizer")
-    
+
     // Animate 3 bars with different offsets
     val scale1 by infiniteTransition.animateFloat(
         initialValue = 0.2f,

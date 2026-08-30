@@ -7,6 +7,7 @@ import com.example.rekamaudio.data.model.Recording
 import com.example.rekamaudio.data.repository.AudioCaptureRepository
 import com.example.rekamaudio.data.repository.SettingsRepository
 import com.example.rekamaudio.player.AudioPlayer
+import com.example.rekamaudio.player.PlaybackProgress
 import com.example.rekamaudio.service.AudioCaptureService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -28,6 +29,8 @@ class MainViewModel @Inject constructor(
 
     private val _playbackState = MutableStateFlow<Long?>(null)
     val playbackState: StateFlow<Long?> = _playbackState.asStateFlow()
+
+    val playbackProgress: StateFlow<PlaybackProgress> = audioPlayer.progress
 
     private val _events = MutableSharedFlow<MainEvent>()
     val events = _events.asSharedFlow()
@@ -61,6 +64,10 @@ class MainViewModel @Inject constructor(
     fun stopPlayback() {
         audioPlayer.stop()
         _playbackState.value = null
+    }
+
+    fun seekTo(positionMs: Int) {
+        audioPlayer.seekTo(positionMs)
     }
 
     override fun onCleared() {

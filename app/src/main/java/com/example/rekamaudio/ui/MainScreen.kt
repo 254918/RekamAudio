@@ -24,10 +24,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rekamaudio.R
 import com.example.rekamaudio.data.model.Recording
 import com.example.rekamaudio.service.AudioCaptureService
 import com.example.rekamaudio.ui.components.RecordingItem
@@ -43,6 +45,7 @@ fun MainScreen(
     val recordings by viewModel.recordings.collectAsState()
     val selectedIds by viewModel.selectedRecordingIds.collectAsState()
     val playbackState by viewModel.playbackState.collectAsState()
+    val playbackProgress by viewModel.playbackProgress.collectAsState()
     val context = LocalContext.current
     val isSelectionMode = selectedIds.isNotEmpty()
 
@@ -80,7 +83,9 @@ fun MainScreen(
                         putExtra(Intent.EXTRA_STREAM, event.uri.toUri())
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-                    context.startActivity(Intent.createChooser(shareIntent, "Share Recording"))
+                    context.startActivity(
+                        Intent.createChooser(shareIntent, context.getString(R.string.share_recording))
+                    )
                 }
                 is MainEvent.ShareSelected -> {
                     val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
@@ -91,7 +96,9 @@ fun MainScreen(
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-                    context.startActivity(Intent.createChooser(shareIntent, "Share Recordings"))
+                    context.startActivity(
+                        Intent.createChooser(shareIntent, context.getString(R.string.share_recordings))
+                    )
                 }
                 is MainEvent.Error -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
@@ -117,7 +124,11 @@ fun MainScreen(
     }
 
     val overlayPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val msg = if (android.provider.Settings.canDrawOverlays(context)) "Overlay Permission Granted" else "Overlay Permission Required"
+        val msg = if (android.provider.Settings.canDrawOverlays(context)) {
+            context.getString(R.string.overlay_permission_granted)
+        } else {
+            context.getString(R.string.overlay_permission_required)
+        }
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
@@ -125,7 +136,7 @@ fun MainScreen(
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
             viewModel.startOverlayService(result.resultCode, result.data!!)
         } else {
-            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -146,7 +157,7 @@ fun MainScreen(
             val mpManager = context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
             mediaProjectionLauncher.launch(mpManager.createScreenCaptureIntent())
         } else {
-            Toast.makeText(context, "Permissions required", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.permissions_required), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -154,27 +165,27 @@ fun MainScreen(
         topBar = {
             if (isSelectionMode) {
                 TopAppBar(
-                    title = { Text("${selectedIds.size} Selected") },
+                    title = { Text(stringResource(R.string.selected_count, selectedIds.size)) },
                     navigationIcon = {
                         IconButton(onClick = { viewModel.clearSelection() }) {
-                            Icon(Icons.Default.Close, contentDescription = "Close Selection")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close_selection))
                         }
                     },
                     actions = {
                         IconButton(onClick = { viewModel.shareSelectedRecordings() }) {
-                            Icon(Icons.Default.Share, contentDescription = "Share Selected")
+                            Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share_selected))
                         }
                         IconButton(onClick = { viewModel.deleteSelectedRecordings() }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete Selected")
+                            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_selected))
                         }
                     }
                 )
             } else {
                 TopAppBar(
-                    title = { Text("Rekam Audio") },
+                    title = { Text(stringResource(R.string.main_title)) },
                     actions = {
                         IconButton(onClick = onSettingsClick) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                         }
                     }
                 )
@@ -197,7 +208,9 @@ fun MainScreen(
                 ) {
                     Icon(
                         imageVector = if (uiState is RecordingUiState.Recording) Icons.Default.Stop else Icons.Default.Mic,
-                        contentDescription = if (uiState is RecordingUiState.Recording) "Stop" else "Record"
+                        contentDescription = stringResource(
+                            if (uiState is RecordingUiState.Recording) R.string.stop else R.string.record
+                        )
                     )
                 }
             }
@@ -206,7 +219,7 @@ fun MainScreen(
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             if (recordings.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No recordings yet")
+                    Text(stringResource(R.string.no_recordings))
                 }
             } else {
                 LazyColumn {
@@ -216,6 +229,8 @@ fun MainScreen(
                             isSelectionMode = isSelectionMode,
                             isSelected = selectedIds.contains(recording.id),
                             isPlaying = playbackState == recording.id,
+                            playbackProgress = playbackProgress,
+                            onSeek = { viewModel.seekTo(it) },
                             onDelete = { viewModel.deleteRecording(it) },
                             onRename = { setRecordingToRename(it); setShowRenameDialog(true) },
                             onShare = { viewModel.shareRecording(it) },

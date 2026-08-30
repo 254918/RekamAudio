@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Rekam 录音机</string>
+    <string name="start_recording_label">快速录音</string>
+    <string name="stop_recording_label">停止录音</string>
+
+    <!-- Main Screen -->
+    <string name="main_title">Rekam 录音机</string>
+    <string name="settings">设置</string>
+    <string name="no_recordings">暂无录音</string>
+    <string name="selected_count">已选择 %1$d 项</string>
+    <string name="close_selection">取消选择</string>
+    <string name="share_selected">分享所选</string>
+    <string name="delete_selected">删除所选</string>
+    <string name="record">录音</string>
+    <string name="stop">停止</string>
+
+    <!-- Recording Item -->
+    <string name="recording">录音文件</string>
+    <string name="date_label">日期：%1$s</string>
+    <string name="play">播放</string>
+    <string name="more">更多</string>
+    <string name="share">分享</string>
+    <string name="rename">重命名</string>
+    <string name="delete">删除</string>
+    <string name="duration_label">时长：%1$s</string>
+
+    <!-- Share -->
+    <string name="share_recording">分享录音</string>
+    <string name="share_recordings">分享录音</string>
+
+    <!-- Permissions -->
+    <string name="overlay_permission_granted">悬浮窗权限已授予</string>
+    <string name="overlay_permission_required">需要悬浮窗权限</string>
+    <string name="permission_denied">权限被拒绝</string>
+    <string name="permissions_required">需要相关权限</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="back">返回</string>
+    <string name="audio_category">音频</string>
+    <string name="audio_quality">音频质量</string>
+    <string name="high_quality_wav">高质量 (WAV)</string>
+    <string name="medium_quality_m4a">中等质量 (M4A)</string>
+    <string name="choose_audio_quality">选择音频质量</string>
+    <string name="high_quality_desc">高 (WAV) – 无压缩</string>
+    <string name="medium_quality_desc">中 (M4A) – 压缩格式</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+
+    <!-- Rename Dialog -->
+    <string name="rename_recording">重命名录音</string>
+    <string name="name_label">名称</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">录音服务</string>
+    <string name="notification_recording_title">正在录音</string>
+    <string name="notification_recording_text">正在采集音频…</string>
+
+    <!-- Overlay -->
+    <string name="overlay_record">录音</string>
+    <string name="overlay_stop">停止</string>
+    <string name="overlay_close">关闭悬浮窗</string>
+</resources>

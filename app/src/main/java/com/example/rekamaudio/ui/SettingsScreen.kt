@@ -31,9 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rekamaudio.R
 import com.example.rekamaudio.data.model.AudioQuality
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,10 +61,10 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { Text(stringResource(R.string.settings_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )
@@ -74,17 +76,17 @@ fun SettingsScreen(
                 .padding(paddingValues)
         ) {
             Text(
-                text = "Audio",
+                text = stringResource(R.string.audio_category),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
             )
 
             SettingsItem(
-                title = "Audio Quality",
+                title = stringResource(R.string.audio_quality),
                 subtitle = when (currentQuality) {
-                    AudioQuality.HIGH_QUALITY_WAV -> "High Quality (WAV)"
-                    AudioQuality.MEDIUM_QUALITY_M4A -> "Medium Quality (M4A)"
+                    AudioQuality.HIGH_QUALITY_WAV -> stringResource(R.string.high_quality_wav)
+                    AudioQuality.MEDIUM_QUALITY_M4A -> stringResource(R.string.medium_quality_m4a)
                 },
                 onClick = { showQualityDialog = true }
             )
@@ -128,7 +130,7 @@ fun AudioQualityDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Choose Audio Quality") },
+        title = { Text(stringResource(R.string.choose_audio_quality)) },
         text = {
             Column(Modifier.selectableGroup()) {
                 AudioQuality.values().forEach { quality ->
@@ -150,8 +152,8 @@ fun AudioQualityDialog(
                         )
                         Text(
                             text = when (quality) {
-                                AudioQuality.HIGH_QUALITY_WAV -> "High (WAV) - Uncompressed"
-                                AudioQuality.MEDIUM_QUALITY_M4A -> "Medium (M4A) - Compressed"
+                                AudioQuality.HIGH_QUALITY_WAV -> stringResource(R.string.high_quality_desc)
+                                AudioQuality.MEDIUM_QUALITY_M4A -> stringResource(R.string.medium_quality_desc)
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(start = 16.dp)
@@ -164,12 +166,12 @@ fun AudioQualityDialog(
             TextButton(
                 onClick = { onConfirm(selectedQuality) }
             ) {
-                Text("Confirm")
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

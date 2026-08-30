@@ -2,30 +2,48 @@ package com.example.rekamaudio.service
 
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.WindowManager
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
@@ -37,14 +55,17 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.example.rekamaudio.R
 import com.example.rekamaudio.ui.theme.RekamAudioTheme
+import kotlin.math.roundToInt
 
 class OverlayManager(private val context: Context) {
 
     private var windowManager: WindowManager? = null
     private var overlayView: ComposeView? = null
+    private var windowParams: WindowManager.LayoutParams? = null
     private var isOverlayShown = false
-    
+
     // State to drive the Compose UI
     private var isRecordingState by mutableStateOf(false)
     private var lifecycleOwner: OverlayLifecycleOwner? = null
@@ -57,17 +78,8 @@ class OverlayManager(private val context: Context) {
 
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-            PixelFormat.TRANSLUCENT
-        )
-
-        params.gravity = Gravity.TOP or Gravity.START
-        params.x = 100
-        params.y = 100
+        val params = createOverlayParams()
+        windowParams = params
 
         // Initialize Lifecycle Owner
         lifecycleOwner = OverlayLifecycleOwner()
@@ -78,7 +90,7 @@ class OverlayManager(private val context: Context) {
             setViewTreeLifecycleOwner(lifecycleOwner)
             setViewTreeSavedStateRegistryOwner(lifecycleOwner)
             setViewTreeViewModelStoreOwner(lifecycleOwner)
-            
+
             setContent {
                 RekamAudioTheme(
                     dynamicColor = true // Ensure dynamic colors matching the app
@@ -87,7 +99,8 @@ class OverlayManager(private val context: Context) {
                         isRecording = isRecordingState,
                         onRecordClick = onRecordClick,
                         onStopClick = onStopClick,
-                        onCloseClick = onCloseClick
+                        onCloseClick = onCloseClick,
+                        onDrag = { dx, dy -> moveBy(dx, dy) }
                     )
                 }
             }
@@ -96,7 +109,7 @@ class OverlayManager(private val context: Context) {
         // Start Lifecycle
         lifecycleOwner?.handleLifecycleEvent(Lifecycle.Event.ON_START)
         lifecycleOwner?.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        
+
         updateState(isRecording)
 
         try {
@@ -107,6 +120,58 @@ class OverlayManager(private val context: Context) {
         }
     }
 
+    private fun createOverlayParams(): WindowManager.LayoutParams {
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+            PixelFormat.TRANSLUCENT
+        )
+        params.gravity = Gravity.TOP or Gravity.START
+        val density = context.resources.displayMetrics.density
+        // Appear near the top-right corner (window size + margin)
+        params.x = (screenBounds().width() - (OVERLAY_WINDOW_SIZE_DP + 24) * density).toInt().coerceAtLeast(0)
+        params.y = (110 * density).toInt().coerceAtLeast(0)
+        return params
+    }
+
+    /**
+     * Moves the overlay by the given pixel delta, keeping it fully on screen.
+     */
+    fun moveBy(dx: Float, dy: Float) {
+        val params = windowParams ?: return
+        val view = overlayView ?: return
+        val wm = windowManager ?: return
+        if (dx == 0f && dy == 0f) return
+
+        val bounds = screenBounds()
+        val density = context.resources.displayMetrics.density
+        val viewWidth = if (view.width > 0) view.width else (OVERLAY_WINDOW_SIZE_DP * density).toInt()
+        val viewHeight = if (view.height > 0) view.height else (OVERLAY_WINDOW_SIZE_DP * density).toInt()
+
+        params.x = (params.x + dx).roundToInt().coerceIn(0, (bounds.width() - viewWidth).coerceAtLeast(0))
+        params.y = (params.y + dy).roundToInt().coerceIn(0, (bounds.height() - viewHeight).coerceAtLeast(0))
+
+        try {
+            wm.updateViewLayout(view, params)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun screenBounds(): Rect {
+        val wm = windowManager ?: return Rect()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            wm.maximumWindowMetrics.bounds
+        } else {
+            val metrics = DisplayMetrics()
+            @Suppress("DEPRECATION")
+            wm.defaultDisplay.getRealMetrics(metrics)
+            Rect(0, 0, metrics.widthPixels, metrics.heightPixels)
+        }
+    }
+
     fun removeOverlay() {
         if (isOverlayShown && overlayView != null) {
             try {
@@ -114,9 +179,10 @@ class OverlayManager(private val context: Context) {
                 lifecycleOwner?.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
                 lifecycleOwner?.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
                 lifecycleOwner?.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                
+
                 windowManager?.removeView(overlayView)
                 overlayView = null
+                windowParams = null
                 lifecycleOwner = null
                 isOverlayShown = false
             } catch (e: Exception) {
@@ -128,70 +194,125 @@ class OverlayManager(private val context: Context) {
     fun updateState(isRecording: Boolean) {
         isRecordingState = isRecording
     }
+
+    companion object {
+        // Window / touch area big enough to also fit the pulse halo and drag shadow
+        private const val OVERLAY_WINDOW_SIZE_DP = 80
+    }
 }
+
+private val OVERLAY_WINDOW_SIZE = 80.dp
+private val BUTTON_SIZE = 52.dp
+private val BADGE_SIZE = 24.dp
 
 @Composable
 fun OverlayContent(
     isRecording: Boolean,
     onRecordClick: () -> Unit,
     onStopClick: () -> Unit,
-    onCloseClick: () -> Unit
+    onCloseClick: () -> Unit,
+    onDrag: (Float, Float) -> Unit
 ) {
-    Surface(
-        shape = RoundedCornerShape(50), // Pill shape
-        color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.9f), // Premium glass-like feel
-        shadowElevation = 8.dp,
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Record / Stop Button
-            if (isRecording) {
-                IconButton(
-                    onClick = onStopClick,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    ),
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Stop,
-                        contentDescription = "Stop"
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = onRecordClick,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Mic,
-                        contentDescription = "Record"
-                    )
-                }
-            }
+    var isDragging by remember { mutableStateOf(false) }
+    val dragScale by animateFloatAsState(
+        targetValue = if (isDragging) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "dragScale"
+    )
 
-            // Close Button (Only show when not recording to prevent accidents)
-            if (!isRecording) {
-                IconButton(
-                    onClick = onCloseClick,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(OVERLAY_WINDOW_SIZE)
+    ) {
+        // Pulsing halo while recording
+        if (isRecording) {
+            val infiniteTransition = rememberInfiniteTransition(label = "recordingPulse")
+            val pulseScale by infiniteTransition.animateFloat(
+                initialValue = 0.9f,
+                targetValue = 1.4f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1200, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "pulseScale"
+            )
+            val pulseAlpha by infiniteTransition.animateFloat(
+                initialValue = 0.4f,
+                targetValue = 0f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1200, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "pulseAlpha"
+            )
+            Box(
+                modifier = Modifier
+                    .size(BUTTON_SIZE)
+                    .scale(pulseScale)
+                    .background(MaterialTheme.colorScheme.error.copy(alpha = pulseAlpha), CircleShape)
+            )
+        }
+
+        // Main circular button – tap to toggle recording, drag to move
+        Surface(
+            onClick = if (isRecording) onStopClick else onRecordClick,
+            shape = CircleShape,
+            color = if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+            contentColor = if (isRecording) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
+            shadowElevation = if (isDragging) 12.dp else 6.dp,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+            modifier = Modifier
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { isDragging = true },
+                        onDragEnd = { isDragging = false },
+                        onDragCancel = { isDragging = false },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            onDrag(dragAmount.x, dragAmount.y)
+                        }
+                    )
+                }
+                .graphicsLayer {
+                    scaleX = dragScale
+                    scaleY = dragScale
+                }
+                .size(BUTTON_SIZE)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
+                    contentDescription = stringResource(
+                        if (isRecording) R.string.overlay_stop else R.string.overlay_record
                     ),
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+        }
+
+        // Small close badge on the top-right corner (only when idle)
+        if (!isRecording) {
+            Surface(
+                onClick = onCloseClick,
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-8).dp, y = 8.dp)
+                    .size(BADGE_SIZE)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close"
+                        contentDescription = stringResource(R.string.overlay_close),
+                        modifier = Modifier.size(13.dp)
                     )
                 }
             }
@@ -201,7 +322,7 @@ fun OverlayContent(
 
 // Custom Lifecycle Owner for WindowManager-attached ComposeViews
 private class OverlayLifecycleOwner : LifecycleRegistryOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
-    
+
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     private val store = ViewModelStore()

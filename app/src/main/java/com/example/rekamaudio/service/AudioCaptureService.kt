@@ -510,7 +510,7 @@ class AudioCaptureService : Service() {
     private fun createNotificationChannel() {
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
-            "Audio Capture Service",
+            getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_DEFAULT
         )
         val manager = getSystemService(NotificationManager::class.java)
@@ -519,8 +519,8 @@ class AudioCaptureService : Service() {
 
     private fun createNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Recording Audio")
-            .setContentText("Capturing internal audio...")
+            .setContentTitle(getString(R.string.notification_recording_title))
+            .setContentText(getString(R.string.notification_recording_text))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .build()
     }

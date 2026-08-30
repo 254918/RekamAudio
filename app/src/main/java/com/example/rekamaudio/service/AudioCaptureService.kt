@@ -28,12 +28,16 @@ import androidx.core.content.ContextCompat
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.arthenica.ffmpegkit.ReturnCode
 import com.example.rekamaudio.R
+import com.example.rekamaudio.data.model.Mp3Bitrate
+import com.example.rekamaudio.data.repository.SettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -49,6 +53,8 @@ import android.media.AudioFormat.ENCODING_PCM_16BIT
 
 @AndroidEntryPoint
 class AudioCaptureService : Service() {
+
+    @Inject lateinit var settingsRepository: SettingsRepository
 
     private var mediaProjectionManager: MediaProjectionManager? = null
     private var mediaProjection: MediaProjection? = null
@@ -246,10 +252,12 @@ class AudioCaptureService : Service() {
                     overlayManager.updateState(true)
                 }
 
+                val mp3Bitrate = settingsRepository.mp3Bitrate.first()
+
                 recordingJob = launch {
                     when (audioQuality) {
                         AudioQuality.HIGH_QUALITY_WAV -> recordWavAudio(bufferSize)
-                        AudioQuality.COMPATIBLE_QUALITY_MP3 -> recordMp3Audio(bufferSize)
+                        AudioQuality.COMPATIBLE_QUALITY_MP3 -> recordMp3Audio(bufferSize, mp3Bitrate)
                         AudioQuality.MEDIUM_QUALITY_M4A -> recordAacAudio(bufferSize)
                     }
                 }
@@ -439,7 +447,7 @@ class AudioCaptureService : Service() {
      * Records raw PCM to a temp file while recording, then encodes it to MP3
      * with ffmpeg (libmp3lame) after stopping and imports the result into MediaStore.
      */
-    private fun recordMp3Audio(bufferSize: Int) {
+    private fun recordMp3Audio(bufferSize: Int, bitrate: Mp3Bitrate) {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val pcmFile = File(cacheDir, "rekam_tmp_$timestamp.pcm")
         val mp3File = File(cacheDir, "rekam_tmp_$timestamp.mp3")
@@ -455,10 +463,10 @@ class AudioCaptureService : Service() {
                 }
             }
 
-            // Encode PCM -> MP3 (192 kbps). Blocking call, immune to coroutine cancellation,
+            // Encode PCM -> MP3. Blocking call, immune to coroutine cancellation,
             // so the encode always finishes even though stopRecording() cancels the job.
             val command = "-y -f s16le -ar $SAMPLE_RATE -ac $CHANNEL_COUNT " +
-                "-i ${pcmFile.absolutePath} -codec:a libmp3lame -b:a 192k ${mp3File.absolutePath}"
+                "-i ${pcmFile.absolutePath} -codec:a libmp3lame -b:a ${bitrate.bitsPerSecond} ${mp3File.absolutePath}"
             val session = FFmpegKit.execute(command)
 
             if (!ReturnCode.isSuccess(session.returnCode)) {

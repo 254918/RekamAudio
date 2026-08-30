@@ -87,10 +87,20 @@ fun RecordingItem(
 
             Column(modifier = Modifier.weight(1f).padding(8.dp)) {
                 Text(text = recording.fileName, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    text = stringResource(R.string.date_label, dateText),
-                    style = MaterialTheme.typography.labelSmall
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.date_label, dateText),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    val sizeText = remember(recording.fileSizeBytes) { formatFileSize(recording.fileSizeBytes) }
+                    if (sizeText.isNotEmpty()) {
+                        Text(
+                            text = " · $sizeText",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
                 if (isPlaying) {
                     if (playbackProgress.durationMs > 0) {
                         PlaybackProgressBar(
@@ -193,6 +203,19 @@ private fun formatDuration(ms: Int): String {
         String.format(Locale.US, "%d:%02d:%02d", hours, minutes, seconds)
     } else {
         String.format(Locale.US, "%d:%02d", minutes, seconds)
+    }
+}
+
+private fun formatFileSize(bytes: Long): String {
+    if (bytes <= 0) return ""
+    val kb = 1024.0
+    val mb = kb * 1024
+    val gb = mb * 1024
+    return when {
+        bytes < kb -> String.format(Locale.US, "%d B", bytes)
+        bytes < mb -> String.format(Locale.US, "%.1f KB", bytes / kb)
+        bytes < gb -> String.format(Locale.US, "%.1f MB", bytes / mb)
+        else -> String.format(Locale.US, "%.2f GB", bytes / gb)
     }
 }
 

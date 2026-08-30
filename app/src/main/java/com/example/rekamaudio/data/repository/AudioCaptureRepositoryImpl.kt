@@ -52,7 +52,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATE_ADDED,
-            MediaStore.Audio.Media.RELATIVE_PATH
+            MediaStore.Audio.Media.RELATIVE_PATH,
+            MediaStore.Audio.Media.SIZE
         )
 
         val sortOrder = "${MediaStore.Audio.Media.DATE_ADDED} DESC"
@@ -72,6 +73,7 @@ class AudioCaptureRepositoryImpl @Inject constructor(
             val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val dateAddedColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
             val pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.RELATIVE_PATH)
+            val sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
@@ -79,6 +81,7 @@ class AudioCaptureRepositoryImpl @Inject constructor(
                 val duration = cursor.getLong(durationColumn)
                 val dateAdded = cursor.getLong(dateAddedColumn)
                 val relativePath = cursor.getString(pathColumn)
+                val fileSize = cursor.getLong(sizeColumn)
 
                 val contentUri: Uri = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -97,7 +100,8 @@ class AudioCaptureRepositoryImpl @Inject constructor(
                             fileName = name,
                             fileUri = contentUri.toString(),
                             durationMs = duration,
-                            createdAt = dateAdded * 1000 // DATE_ADDED is in seconds
+                            createdAt = dateAdded * 1000, // DATE_ADDED is in seconds
+                            fileSizeBytes = fileSize
                         )
                     )
                 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.rekamaudio.R
 import com.example.rekamaudio.data.model.AudioQuality
+import com.example.rekamaudio.data.model.Mp3Bitrate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,15 +46,28 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val currentQuality by viewModel.audioQuality.collectAsState()
+    val currentBitrate by viewModel.mp3Bitrate.collectAsState()
     var showQualityDialog by remember { mutableStateOf(false) }
+    var showBitrateDialog by remember { mutableStateOf(false) }
 
     if (showQualityDialog) {
         AudioQualityDialog(
             currentQuality = currentQuality,
             onDismiss = { showQualityDialog = false },
-            onConfirm = { 
+            onConfirm = {
                 viewModel.setAudioQuality(it)
                 showQualityDialog = false
+            }
+        )
+    }
+
+    if (showBitrateDialog) {
+        Mp3BitrateDialog(
+            currentBitrate = currentBitrate,
+            onDismiss = { showBitrateDialog = false },
+            onConfirm = {
+                viewModel.setMp3Bitrate(it)
+                showBitrateDialog = false
             }
         )
     }
@@ -91,6 +105,14 @@ fun SettingsScreen(
                 },
                 onClick = { showQualityDialog = true }
             )
+
+            if (currentQuality == AudioQuality.COMPATIBLE_QUALITY_MP3) {
+                SettingsItem(
+                    title = stringResource(R.string.mp3_bitrate),
+                    subtitle = currentBitrate.label,
+                    onClick = { showBitrateDialog = true }
+                )
+            }
         }
     }
 }
@@ -119,6 +141,64 @@ fun SettingsItem(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
+}
+
+@Composable
+fun Mp3BitrateDialog(
+    currentBitrate: Mp3Bitrate,
+    onDismiss: () -> Unit,
+    onConfirm: (Mp3Bitrate) -> Unit
+) {
+    var selectedBitrate by remember { mutableStateOf(currentBitrate) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.choose_mp3_bitrate)) },
+        text = {
+            Column(Modifier.selectableGroup()) {
+                Mp3Bitrate.values().forEach { bitrate ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .selectable(
+                                selected = (bitrate == selectedBitrate),
+                                onClick = { selectedBitrate = bitrate },
+                                role = Role.RadioButton
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (bitrate == selectedBitrate),
+                            onClick = null // null recommended for accessibility with selectable
+                        )
+                        Text(
+                            text = when (bitrate) {
+                                Mp3Bitrate.BITRATE_128 -> stringResource(R.string.bitrate_128_desc)
+                                Mp3Bitrate.BITRATE_192 -> stringResource(R.string.bitrate_192_desc)
+                                Mp3Bitrate.BITRATE_320 -> stringResource(R.string.bitrate_320_desc)
+                            },
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onConfirm(selectedBitrate) }
+            ) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 @Composable

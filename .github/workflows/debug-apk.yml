@@ -41,12 +41,14 @@ jobs:
           tag_name: apk
           name: Rekam Audio
           body: |
-            Rekam Audio APK (v1.1.0)
+            Rekam Audio APK (v1.2.0, arm64)
 
             - Chinese localization (zh-CN / zh-TW)
             - WAV / M4A / MP3 recording formats
+            - Configurable MP3 bitrate (128 / 192 / 320 kbps)
             - Playback seek bar
             - Draggable floating record button
+            - File size shown in recording list
 
             Download `RekamAudio.apk` below and install it on your Android device.
           files: RekamAudio.apk

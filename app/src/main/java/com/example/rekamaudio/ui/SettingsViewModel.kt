@@ -3,6 +3,7 @@ package com.example.rekamaudio.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rekamaudio.data.model.AudioQuality
+import com.example.rekamaudio.data.model.Mp3Bitrate
 import com.example.rekamaudio.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,6 +27,19 @@ class SettingsViewModel @Inject constructor(
     fun setAudioQuality(quality: AudioQuality) {
         viewModelScope.launch {
             settingsRepository.setAudioQuality(quality)
+        }
+    }
+
+    val mp3Bitrate: StateFlow<Mp3Bitrate> = settingsRepository.mp3Bitrate
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Mp3Bitrate.BITRATE_192
+        )
+
+    fun setMp3Bitrate(bitrate: Mp3Bitrate) {
+        viewModelScope.launch {
+            settingsRepository.setMp3Bitrate(bitrate)
         }
     }
 }

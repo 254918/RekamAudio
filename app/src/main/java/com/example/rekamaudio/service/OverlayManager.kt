@@ -243,7 +243,7 @@ private val BUTTON_SIZE = 52.dp
 private val BADGE_SIZE = 24.dp
 
 @Composable
-fun OverlayContent(
+private fun OverlayContent(
     buttonState: OverlayButtonState,
     encodeProgress: Float,
     onRecordClick: () -> Unit,

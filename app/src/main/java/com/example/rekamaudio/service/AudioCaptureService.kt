@@ -569,6 +569,7 @@ class AudioCaptureService : Service() {
                         ("no such" in l) || ("permission" in l) || ("invalid" in l) ||
                         ("failed" in l) || ("unable" in l)
                 }
+                .toList()
                 .takeLast(4)
                 .joinToString(" | ")
                 .take(300)

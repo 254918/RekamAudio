@@ -41,7 +41,7 @@ jobs:
           tag_name: apk
           name: Rekam Audio
           body: |
-            Rekam Audio APK (v1.3.1, arm64)
+            Rekam Audio APK (v1.3.2, arm64)
 
             - Chinese localization (zh-CN / zh-TW)
             - WAV / M4A / MP3 recording formats

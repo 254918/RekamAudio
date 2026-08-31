@@ -498,13 +498,16 @@ class AudioCaptureService : Service() {
                         if (ReturnCode.isSuccess(session.returnCode)) {
                             copyFileToMediaStore(mp3File, "recording_$timestamp.mp3", "audio/mpeg")
                         } else {
-                            Log.e("AudioCaptureService", "MP3 encode failed: rc=${session.returnCode} ${session.getAllLogsAsString()}")
-                            showEncodeErrorNotification()
+                            val detail = extractSessionError(session)
+                            Log.e("AudioCaptureService", "MP3 encode failed: rc=${session.returnCode} $detail")
+                            val savedWav = savePcmAsWav(pcmFile, timestamp)
+                            showEncodeErrorNotification(detail, savedWav)
                         }
                     } catch (t: Throwable) {
                         // Errors (e.g. failed native library init) must never crash the process.
                         Log.e("AudioCaptureService", "Error finishing MP3 encode", t)
-                        showEncodeErrorNotification()
+                        val savedWav = savePcmAsWav(pcmFile, timestamp)
+                        showEncodeErrorNotification("${t.javaClass.simpleName}: ${t.message}", savedWav)
                     } finally {
                         pcmFile.delete()
                         mp3File.delete()
@@ -523,11 +526,55 @@ class AudioCaptureService : Service() {
             )
         } catch (t: Throwable) {
             Log.e("AudioCaptureService", "Error starting MP3 encoding", t)
+            val savedWav = savePcmAsWav(pcmFile, timestamp)
             pcmFile.delete()
             mp3File.delete()
             overlayManager.hideEncoding()
             restoreIdleNotification()
-            showEncodeErrorNotification()
+            showEncodeErrorNotification("${t.javaClass.simpleName}: ${t.message}", savedWav)
+        }
+    }
+
+    /**
+     * Fallback when MP3 encoding fails: wraps the raw PCM capture in a WAV
+     * header so the user never loses the recording.
+     */
+    private fun savePcmAsWav(pcmFile: File, timestamp: String): Boolean {
+        return try {
+            val wavFile = File(cacheDir, "rekam_tmp_$timestamp.wav")
+            FileOutputStream(wavFile).use { out ->
+                writeWavHeader(out.channel, pcmFile.length(), SAMPLE_RATE, CHANNEL_COUNT)
+                pcmFile.inputStream().use { it.copyTo(out) }
+            }
+            val saved = wavFile.length() > 44
+            if (saved) {
+                copyFileToMediaStore(wavFile, "recording_$timestamp.wav", "audio/wav")
+            }
+            wavFile.delete()
+            saved
+        } catch (t: Throwable) {
+            Log.e("AudioCaptureService", "Failed to save WAV fallback", t)
+            false
+        }
+    }
+
+    /** Pulls the most relevant error lines out of an ffmpeg session log. */
+    private fun extractSessionError(session: com.arthenica.ffmpegkit.FFmpegSession): String {
+        return try {
+            val logs = session.getAllLogsAsString()
+                .lineSequence()
+                .filter { line ->
+                    val l = line.lowercase()
+                    ("error" in l) || ("unknown" in l) || ("not found" in l) ||
+                        ("no such" in l) || ("permission" in l) || ("invalid" in l) ||
+                        ("failed" in l) || ("unable" in l)
+                }
+                .takeLast(4)
+                .joinToString(" | ")
+                .take(300)
+            if (logs.isBlank()) "rc=${session.returnCode}" else logs
+        } catch (t: Throwable) {
+            "rc=${session.returnCode}"
         }
     }
 
@@ -560,10 +607,18 @@ class AudioCaptureService : Service() {
         }
     }
 
-    private fun showEncodeErrorNotification() {
+    private fun showEncodeErrorNotification(detail: String, wavSaved: Boolean) {
+        val title = getString(
+            if (wavSaved) R.string.encode_error_wav_title else R.string.encode_error_title
+        )
+        val summary = getString(
+            if (wavSaved) R.string.encode_error_wav_text else R.string.encode_error_text
+        )
+        val fullText = "$summary\n$detail"
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.encode_error_title))
-            .setContentText(getString(R.string.encode_error_text))
+            .setContentTitle(title)
+            .setContentText(summary)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(fullText))
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setAutoCancel(true)
             .build()

@@ -55,6 +55,8 @@
     <string name="encoding_notification_text">Transcoding MP3… %d%%</string>
     <string name="encode_error_title">MP3 encoding failed</string>
     <string name="encode_error_text">The recording could not be encoded. Please try again.</string>
+    <string name="encode_error_wav_title">MP3 encoding failed – saved as WAV</string>
+    <string name="encode_error_wav_text">MP3 transcoding failed. Your recording was saved as WAV instead.</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 

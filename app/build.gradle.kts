@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.rekamaudio"
         minSdk = 29
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.3.0"
+        versionCode = 6
+        versionName = "1.3.1"
 
         ndk {
             abiFilters += listOf("arm64-v8a")
@@ -24,7 +24,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        // Fixed keystore committed to the repo so every CI build is signed with
+        // the same key and can update-install over the previous release.
+        create("rekamUpload") {
+            storeFile = file("rekam.keystore")
+            storePassword = "rekamaudio"
+            keyAlias = "rekam"
+            keyPassword = "rekamaudio"
+        }
+    }
+
     buildTypes {
+
+        debug {
+            signingConfig = signingConfigs.getByName("rekamUpload")
+        }
 
         release {
             isMinifyEnabled = true

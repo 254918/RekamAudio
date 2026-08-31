@@ -55,6 +55,8 @@
     <string name="encoding_notification_text">正在轉碼 MP3… %d%%</string>
     <string name="encode_error_title">MP3 轉碼失敗</string>
     <string name="encode_error_text">錄音轉碼失敗，請重試</string>
+    <string name="encode_error_wav_title">MP3 轉碼失敗 – 已儲存為 WAV</string>
+    <string name="encode_error_wav_text">MP3 轉碼失敗，錄音已改為 WAV 格式儲存</string>
     <string name="confirm">確定</string>
     <string name="cancel">取消</string>
 

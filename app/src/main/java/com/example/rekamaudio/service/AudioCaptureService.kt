@@ -21,6 +21,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -70,6 +71,7 @@ class AudioCaptureService : Service() {
     private var savedResultCode: Int = 0
     private var savedResultData: Intent? = null
     private var isOverlayMode = false
+    private var lastProgressNotifyMs: Long = 0L
 
     override fun onCreate() {
         super.onCreate()
@@ -444,13 +446,14 @@ class AudioCaptureService : Service() {
     }
 
     /**
-     * Records raw PCM to a temp file while recording, then encodes it to MP3
-     * with ffmpeg (libmp3lame) after stopping and imports the result into MediaStore.
+     * Records raw PCM to a temp file while recording, then hands it off to an
+     * async ffmpeg session for MP3 encoding. The encode runs on ffmpeg-kit's
+     * own executor and is fully decoupled from the recording coroutine, so
+     * cancelling that coroutine at stop time can never abort or crash it.
      */
     private fun recordMp3Audio(bufferSize: Int, bitrate: Mp3Bitrate) {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val pcmFile = File(cacheDir, "rekam_tmp_$timestamp.pcm")
-        val mp3File = File(cacheDir, "rekam_tmp_$timestamp.mp3")
 
         try {
             FileOutputStream(pcmFile).use { outputStream ->
@@ -462,26 +465,117 @@ class AudioCaptureService : Service() {
                     }
                 }
             }
+        } catch (t: Throwable) {
+            Log.e("AudioCaptureService", "Error capturing PCM for MP3", t)
+            pcmFile.delete()
+            return
+        }
 
-            // Encode PCM -> MP3. Blocking call, immune to coroutine cancellation,
-            // so the encode always finishes even though stopRecording() cancels the job.
+        if (pcmFile.length() == 0L) {
+            pcmFile.delete()
+            return
+        }
+
+        encodeMp3Async(pcmFile, timestamp, bitrate)
+    }
+
+    private fun encodeMp3Async(pcmFile: File, timestamp: String, bitrate: Mp3Bitrate) {
+        val mp3File = File(cacheDir, "rekam_tmp_$timestamp.mp3")
+        val totalDurationMs = pcmFile.length() * 1000L / (SAMPLE_RATE * CHANNEL_COUNT * 2L)
+
+        try {
+            overlayManager.showEncoding()
+            updateEncodingNotification(0f)
+
             val command = "-y -f s16le -ar $SAMPLE_RATE -ac $CHANNEL_COUNT " +
                 "-i ${pcmFile.absolutePath} -codec:a libmp3lame -b:a ${bitrate.bitsPerSecond} ${mp3File.absolutePath}"
-            val session = FFmpegKit.execute(command)
 
-            if (!ReturnCode.isSuccess(session.returnCode)) {
-                Log.e("AudioCaptureService", "MP3 encode failed: rc=${session.returnCode} ${session.getAllLogsAsString()}")
-                return
-            }
-
-            copyFileToMediaStore(mp3File, "recording_$timestamp.mp3", "audio/mpeg")
-        } catch (e: Exception) {
-            Log.e("AudioCaptureService", "Error recording MP3", e)
-        } finally {
+            FFmpegKit.executeAsync(
+                command,
+                { session ->
+                    // Completion callback runs on ffmpeg-kit's executor thread.
+                    try {
+                        if (ReturnCode.isSuccess(session.returnCode)) {
+                            copyFileToMediaStore(mp3File, "recording_$timestamp.mp3", "audio/mpeg")
+                        } else {
+                            Log.e("AudioCaptureService", "MP3 encode failed: rc=${session.returnCode} ${session.getAllLogsAsString()}")
+                            showEncodeErrorNotification()
+                        }
+                    } catch (t: Throwable) {
+                        // Errors (e.g. failed native library init) must never crash the process.
+                        Log.e("AudioCaptureService", "Error finishing MP3 encode", t)
+                        showEncodeErrorNotification()
+                    } finally {
+                        pcmFile.delete()
+                        mp3File.delete()
+                        overlayManager.hideEncoding()
+                        restoreIdleNotification()
+                    }
+                },
+                { /* logs ignored */ },
+                { newStatistics ->
+                    if (totalDurationMs > 0) {
+                        val progress = (newStatistics.time / totalDurationMs).toFloat().coerceIn(0f, 1f)
+                        overlayManager.updateEncodingProgress(progress)
+                        updateEncodingNotification(progress)
+                    }
+                }
+            )
+        } catch (t: Throwable) {
+            Log.e("AudioCaptureService", "Error starting MP3 encoding", t)
             pcmFile.delete()
             mp3File.delete()
+            overlayManager.hideEncoding()
+            restoreIdleNotification()
+            showEncodeErrorNotification()
         }
     }
+
+    private fun updateEncodingNotification(progress: Float) {
+        val now = SystemClock.elapsedRealtime()
+        if (progress < 1f && now - lastProgressNotifyMs < 400) return
+        lastProgressNotifyMs = now
+
+        val percent = (progress * 100).toInt().coerceIn(0, 100)
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(getString(R.string.encoding_notification_title))
+            .setContentText(getString(R.string.encoding_notification_text, percent))
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setProgress(100, percent, false)
+            .setOnlyAlertOnce(true)
+            .setOngoing(true)
+            .build()
+        try {
+            notificationManager().notify(NOTIFICATION_ID, notification)
+        } catch (e: Exception) {
+            Log.e("AudioCaptureService", "Failed to update encoding notification", e)
+        }
+    }
+
+    private fun restoreIdleNotification() {
+        try {
+            notificationManager().notify(NOTIFICATION_ID, createNotification())
+        } catch (e: Exception) {
+            Log.e("AudioCaptureService", "Failed to restore notification", e)
+        }
+    }
+
+    private fun showEncodeErrorNotification() {
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(getString(R.string.encode_error_title))
+            .setContentText(getString(R.string.encode_error_text))
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setAutoCancel(true)
+            .build()
+        try {
+            notificationManager().notify(ENCODE_ERROR_NOTIFICATION_ID, notification)
+        } catch (e: Exception) {
+            Log.e("AudioCaptureService", "Failed to show error notification", e)
+        }
+    }
+
+    private fun notificationManager(): NotificationManager =
+        getSystemService(NotificationManager::class.java)
 
     private fun copyFileToMediaStore(file: File, fileName: String, mimeType: String) {
         val values = ContentValues().apply {
@@ -611,6 +705,7 @@ class AudioCaptureService : Service() {
     companion object {
         const val CHANNEL_ID = "AudioCaptureChannel"
         const val NOTIFICATION_ID = 1
+        const val ENCODE_ERROR_NOTIFICATION_ID = 2
         const val ACTION_START = "START"
         const val ACTION_STOP = "STOP"
         const val ACTION_SHOW_OVERLAY = "SHOW_OVERLAY"

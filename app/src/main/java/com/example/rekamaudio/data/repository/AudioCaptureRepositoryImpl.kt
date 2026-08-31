@@ -14,6 +14,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import androidx.core.net.toUri
@@ -25,12 +26,14 @@ class AudioCaptureRepositoryImpl @Inject constructor(
     override fun getRecordings(): Flow<List<Recording>> = callbackFlow {
         val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean) {
-                trySend(queryRecordings())
+                // Re-query off the main thread; send suspends until delivered,
+                // so no change notification is ever dropped.
+                launch { send(queryRecordings()) }
             }
         }
 
         // Initial query
-        trySend(queryRecordings())
+        launch { send(queryRecordings()) }
 
         // Register observer
         val collection =

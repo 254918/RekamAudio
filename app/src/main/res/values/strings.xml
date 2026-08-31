@@ -51,6 +51,10 @@
     <string name="bitrate_128_desc">128 kbps – Smaller files</string>
     <string name="bitrate_192_desc">192 kbps – Balanced (recommended)</string>
     <string name="bitrate_320_desc">320 kbps – Best quality</string>
+    <string name="encoding_notification_title">Transcoding MP3</string>
+    <string name="encoding_notification_text">Transcoding MP3… %d%%</string>
+    <string name="encode_error_title">MP3 encoding failed</string>
+    <string name="encode_error_text">The recording could not be encoded. Please try again.</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 

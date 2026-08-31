@@ -18,6 +18,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
@@ -67,7 +72,8 @@ class OverlayManager(private val context: Context) {
     private var isOverlayShown = false
 
     // State to drive the Compose UI
-    private var isRecordingState by mutableStateOf(false)
+    private var buttonState by mutableStateOf(OverlayButtonState.IDLE)
+    private var encodeProgress by mutableStateOf(0f)
     private var lifecycleOwner: OverlayLifecycleOwner? = null
 
     fun showOverlay(onRecordClick: () -> Unit, onStopClick: () -> Unit, onCloseClick: () -> Unit, isRecording: Boolean) {
@@ -96,7 +102,8 @@ class OverlayManager(private val context: Context) {
                     dynamicColor = true // Ensure dynamic colors matching the app
                 ) {
                     OverlayContent(
-                        isRecording = isRecordingState,
+                        buttonState = buttonState,
+                        encodeProgress = encodeProgress,
                         onRecordClick = onRecordClick,
                         onStopClick = onStopClick,
                         onCloseClick = onCloseClick,
@@ -192,7 +199,31 @@ class OverlayManager(private val context: Context) {
     }
 
     fun updateState(isRecording: Boolean) {
-        isRecordingState = isRecording
+        buttonState = when {
+            isRecording -> OverlayButtonState.RECORDING
+            buttonState == OverlayButtonState.RECORDING -> OverlayButtonState.IDLE
+            // A late "stopped" event must not cancel the encoding state that is
+            // entered right after the user taps stop.
+            else -> buttonState
+        }
+    }
+
+    fun showEncoding() {
+        buttonState = OverlayButtonState.ENCODING
+        encodeProgress = 0f
+    }
+
+    fun updateEncodingProgress(progress: Float) {
+        if (buttonState == OverlayButtonState.ENCODING) {
+            encodeProgress = progress.coerceIn(0f, 1f)
+        }
+    }
+
+    fun hideEncoding() {
+        encodeProgress = 0f
+        if (buttonState == OverlayButtonState.ENCODING) {
+            buttonState = OverlayButtonState.IDLE
+        }
     }
 
     companion object {
@@ -201,13 +232,20 @@ class OverlayManager(private val context: Context) {
     }
 }
 
+private enum class OverlayButtonState {
+    IDLE,
+    RECORDING,
+    ENCODING
+}
+
 private val OVERLAY_WINDOW_SIZE = 80.dp
 private val BUTTON_SIZE = 52.dp
 private val BADGE_SIZE = 24.dp
 
 @Composable
 fun OverlayContent(
-    isRecording: Boolean,
+    buttonState: OverlayButtonState,
+    encodeProgress: Float,
     onRecordClick: () -> Unit,
     onStopClick: () -> Unit,
     onCloseClick: () -> Unit,
@@ -225,7 +263,7 @@ fun OverlayContent(
         modifier = Modifier.size(OVERLAY_WINDOW_SIZE)
     ) {
         // Pulsing halo while recording
-        if (isRecording) {
+        if (buttonState == OverlayButtonState.RECORDING) {
             val infiniteTransition = rememberInfiniteTransition(label = "recordingPulse")
             val pulseScale by infiniteTransition.animateFloat(
                 initialValue = 0.9f,
@@ -253,48 +291,92 @@ fun OverlayContent(
             )
         }
 
-        // Main circular button – tap to toggle recording, drag to move
-        Surface(
-            onClick = if (isRecording) onStopClick else onRecordClick,
-            shape = CircleShape,
-            color = if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-            contentColor = if (isRecording) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
-            shadowElevation = if (isDragging) 12.dp else 6.dp,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
-            modifier = Modifier
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragStart = { isDragging = true },
-                        onDragEnd = { isDragging = false },
-                        onDragCancel = { isDragging = false },
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-                            onDrag(dragAmount.x, dragAmount.y)
-                        }
+        val buttonModifier = Modifier
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = { isDragging = true },
+                    onDragEnd = { isDragging = false },
+                    onDragCancel = { isDragging = false },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        onDrag(dragAmount.x, dragAmount.y)
+                    }
+                )
+            }
+            .graphicsLayer {
+                scaleX = dragScale
+                scaleY = dragScale
+            }
+            .size(BUTTON_SIZE)
+
+        if (buttonState == OverlayButtonState.ENCODING) {
+            // Determinate progress ring while the recording is being transcoded
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                shadowElevation = if (isDragging) 12.dp else 6.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+                modifier = buttonModifier
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val ringColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    Canvas(modifier = Modifier.size(30.dp)) {
+                        val stroke = 4.dp.toPx()
+                        val inset = stroke / 2
+                        val arcSize = Size(size.width - stroke, size.height - stroke)
+                        drawArc(
+                            color = ringColor.copy(alpha = 0.15f),
+                            startAngle = 0f,
+                            sweepAngle = 360f,
+                            useCenter = false,
+                            topLeft = Offset(inset, inset),
+                            size = arcSize,
+                            style = Stroke(width = stroke)
+                        )
+                        drawArc(
+                            color = ringColor,
+                            startAngle = -90f,
+                            sweepAngle = 360f * encodeProgress,
+                            useCenter = false,
+                            topLeft = Offset(inset, inset),
+                            size = arcSize,
+                            style = Stroke(width = stroke, cap = StrokeCap.Round)
+                        )
+                    }
+                }
+            }
+        } else {
+            // Main circular button – tap to toggle recording, drag to move
+            Surface(
+                onClick = if (buttonState == OverlayButtonState.RECORDING) onStopClick else onRecordClick,
+                shape = CircleShape,
+                color = if (buttonState == OverlayButtonState.RECORDING) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                contentColor = if (buttonState == OverlayButtonState.RECORDING) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
+                shadowElevation = if (isDragging) 12.dp else 6.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+                modifier = buttonModifier
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (buttonState == OverlayButtonState.RECORDING) Icons.Default.Stop else Icons.Default.Mic,
+                        contentDescription = stringResource(
+                            if (buttonState == OverlayButtonState.RECORDING) R.string.overlay_stop else R.string.overlay_record
+                        ),
+                        modifier = Modifier.size(26.dp)
                     )
                 }
-                .graphicsLayer {
-                    scaleX = dragScale
-                    scaleY = dragScale
-                }
-                .size(BUTTON_SIZE)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                    contentDescription = stringResource(
-                        if (isRecording) R.string.overlay_stop else R.string.overlay_record
-                    ),
-                    modifier = Modifier.size(26.dp)
-                )
             }
         }
 
         // Small close badge on the top-right corner (only when idle)
-        if (!isRecording) {
+        if (buttonState == OverlayButtonState.IDLE) {
             Surface(
                 onClick = onCloseClick,
                 shape = CircleShape,

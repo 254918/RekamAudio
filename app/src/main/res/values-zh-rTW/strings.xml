@@ -51,6 +51,10 @@
     <string name="bitrate_128_desc">128 kbps – 體積小</string>
     <string name="bitrate_192_desc">192 kbps – 均衡（推薦）</string>
     <string name="bitrate_320_desc">320 kbps – 最高音質</string>
+    <string name="encoding_notification_title">正在轉碼 MP3</string>
+    <string name="encoding_notification_text">正在轉碼 MP3… %d%%</string>
+    <string name="encode_error_title">MP3 轉碼失敗</string>
+    <string name="encode_error_text">錄音轉碼失敗，請重試</string>
     <string name="confirm">確定</string>
     <string name="cancel">取消</string>
 

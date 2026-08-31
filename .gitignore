@@ -5,6 +5,8 @@ build/
 *.aar
 *.jks
 *.keystore
+# Fixed CI signing key must be versioned so all builds share one signature
+!app/rekam.keystore
 
 # Android Studio / IntelliJ
 .idea/

@@ -345,6 +345,7 @@ private fun OverlayContent(
             }
 
             Surface(
+                onClick = onStopClick,
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,

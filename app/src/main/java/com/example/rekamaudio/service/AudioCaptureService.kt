@@ -512,11 +512,18 @@ class AudioCaptureService : Service() {
                 return
             }
 
-            overlayManager.showEncoding()
+            // Show recording state (pulse animation), NOT encoding ring
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                overlayManager.updateState(true)
+            }
             updateEncodingNotification(0f)
 
             val command = "-y -f s16le -ar $SAMPLE_RATE -ac $CHANNEL_COUNT " +
                 "-i ${fifoFile.absolutePath} -codec:a libmp3lame -b:a ${bitrate.bitsPerSecond} ${mp3File.absolutePath}"
+
+            // Use a latch to track if ffmpeg has opened the FIFO for reading
+            val fifoReady = java.util.concurrent.CountDownLatch(1)
+            var recordingStarted = false
 
             // Start ffmpeg reading from the FIFO (runs on ffmpeg-kit's own thread)
             FFmpegKit.executeAsync(
@@ -552,6 +559,8 @@ class AudioCaptureService : Service() {
             // Open the FIFO for writing. This blocks until the reader (ffmpeg)
             // opens it for reading, which should already be the case after the delay.
             FileOutputStream(fifoFile).use { outputStream ->
+                recordingStarted = true
+                fifoReady.countDown()
                 val buffer = ByteArray(bufferSize)
                 while (isRecording) {
                     val readResult = audioRecord?.read(buffer, 0, bufferSize) ?: 0
@@ -562,6 +571,9 @@ class AudioCaptureService : Service() {
             }
             // The FIFO closes with FileOutputStream.use {}, which sends EOF to ffmpeg.
             // ffmpeg will now finish writing the MP3 file.
+
+            // Show encoding ring briefly while ffmpeg finishes writing
+            overlayManager.showEncoding()
 
         } catch (t: Throwable) {
             Log.e("AudioCaptureService", "Error in streaming MP3 recording", t)

@@ -22,6 +22,7 @@ Unlike traditional recorders that use the microphone, Rekam Audio taps directly 
 *   **🎛 Multi-Format Recording**
     *   **WAV** – lossless, **M4A** – compressed AAC, or **MP3** – universal compatibility.
     *   Selectable MP3 bitrate: **128 / 192 / 320 kbps**.
+    *   **Streaming MP3 encoding** – real-time encode while recording, no post-recording wait (128 / 192 kbps).
     *   Live transcoding progress shown on the floating button and notification.
     *   If MP3 encoding ever fails, the recording is automatically saved as WAV so nothing is lost.
 
@@ -61,6 +62,7 @@ Unlike traditional recorders that use the microphone, Rekam Audio taps directly 
 *   **🎛 多格式录音**
     *   **WAV** 无损、**M4A** 压缩、**MP3** 通用格式三选一。
     *   MP3 码率三档可选：**128 / 192 / 320 kbps**。
+    *   **实时流式 MP3 编码** – 边录边编码，停止即出文件，无需等待转码（支持 128/192 kbps）。
     *   悬浮按钮和通知栏实时显示 MP3 转码进度。
     *   转码失败时自动降级保存 WAV，录音绝不丢失。
 
@@ -93,7 +95,7 @@ Unlike traditional recorders that use the microphone, Rekam Audio taps directly 
 ## 🇮🇩 Fitur Utama (Bahasa Indonesia)
 **Mengapa memilih Rekam Audio?**
 *   **Perekam Suara Internal Murni:** Merekam audio sistem langsung (Zoom, Google Meet, YouTube, Spotify) tanpa suara bising dari luar. Tidak perlu root! (Android 10+).
-*   **Multi-Format:** WAV (lossless), M4A, atau MP3 dengan pilihan bitrate 128/192/320 kbps, lengkap dengan progress bar pemutar dan tombol melayang yang bisa digeser.
+*   **Multi-Format:** WAV (lossless), M4A, atau MP3 dengan pilihan bitrate 128/192/320 kbps, dilengkapi streaming MP3 encoding real-time (128/192 kbps) dan progress bar pemutar serta tombol melayang yang bisa digeser.
 *   **Desain Material You:** Tampilan modern yang mengikuti warna wallpaper HP Anda.
 *   **Tombol Melayang (Overlay):** Mulai/stop rekaman dari aplikasi apa saja tanpa ribet.
 *   **Manajemen File Mudah:** Putar, ganti nama, dan bagikan rekaman langsung ke WhatsApp atau media sosial.

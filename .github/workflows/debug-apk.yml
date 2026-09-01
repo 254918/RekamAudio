@@ -48,6 +48,7 @@ jobs:
             - Chinese localization (zh-CN / zh-TW) · 中文界面（简体中文 + 繁體中文）
             - WAV / M4A / MP3 recording formats · WAV（无损）/ M4A / MP3 三种录音格式
             - Configurable MP3 bitrate (128 / 192 / 320 kbps) · MP3 码率三档可选（128 / 192 / 320 kbps）
+            - Streaming MP3 encoding (real-time, no post-recording wait) · 实时流式 MP3 编码（边录边编码，停止即出文件）
             - Live MP3 transcoding progress (overlay ring + notification) · MP3 转码实时进度（悬浮按钮进度环 + 通知栏百分比）
             - WAV fallback when MP3 encoding fails · 转码失败时自动降级保存 WAV，录音绝不丢失
             - Playback seek bar · 播放进度条，可拖动跳转任意位置

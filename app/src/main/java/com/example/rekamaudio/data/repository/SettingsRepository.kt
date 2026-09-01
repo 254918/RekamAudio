@@ -9,4 +9,6 @@ interface SettingsRepository {
     suspend fun setAudioQuality(quality: AudioQuality)
     val mp3Bitrate: Flow<Mp3Bitrate>
     suspend fun setMp3Bitrate(bitrate: Mp3Bitrate)
+    val streamingEncoding: Flow<Boolean>
+    suspend fun setStreamingEncoding(enabled: Boolean)
 }

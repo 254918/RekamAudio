@@ -9,6 +9,7 @@ import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -34,7 +35,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -310,7 +313,37 @@ private fun OverlayContent(
             .size(BUTTON_SIZE)
 
         if (buttonState == OverlayButtonState.ENCODING) {
-            // Determinate progress ring while the recording is being transcoded
+            // Encoding in progress: determinate ring (post-recording) or spinning (streaming)
+            val isIndeterminate = encodeProgress <= 0f
+            val sweepAngle by if (isIndeterminate) {
+                val infiniteTransition = rememberInfiniteTransition(label = "encodingSpin")
+                infiniteTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 360f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Restart
+                    ),
+                    label = "spinAngle"
+                )
+            } else {
+                remember { derivedStateOf { 360f * encodeProgress } }
+            }
+            val startAngle by if (isIndeterminate) {
+                val infiniteTransition = rememberInfiniteTransition(label = "encodingSpin2")
+                infiniteTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 360f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1500, easing = LinearEasing),
+                        repeatMode = RepeatMode.Restart
+                    ),
+                    label = "spinStart"
+                )
+            } else {
+                remember { mutableFloatStateOf(-90f) }
+            }
+
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.secondaryContainer,
@@ -328,6 +361,7 @@ private fun OverlayContent(
                         val stroke = 4.dp.toPx()
                         val inset = stroke / 2
                         val arcSize = Size(size.width - stroke, size.height - stroke)
+                        // Background ring
                         drawArc(
                             color = ringColor.copy(alpha = 0.15f),
                             startAngle = 0f,
@@ -337,10 +371,11 @@ private fun OverlayContent(
                             size = arcSize,
                             style = Stroke(width = stroke)
                         )
+                        // Foreground arc
                         drawArc(
                             color = ringColor,
-                            startAngle = -90f,
-                            sweepAngle = 360f * encodeProgress,
+                            startAngle = startAngle,
+                            sweepAngle = if (isIndeterminate) 90f else sweepAngle,
                             useCenter = false,
                             topLeft = Offset(inset, inset),
                             size = arcSize,

@@ -57,6 +57,9 @@
     <string name="encode_error_text">The recording could not be encoded. Please try again.</string>
     <string name="encode_error_wav_title">MP3 encoding failed – saved as WAV</string>
     <string name="encode_error_wav_text">MP3 transcoding failed. Your recording was saved as WAV instead.</string>
+    <string name="streaming_encoding">Streaming MP3 encoding</string>
+    <string name="streaming_encoding_on">On – encodes in real-time, supports 128/192 kbps</string>
+    <string name="streaming_encoding_off">Off – encodes after stopping</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
 

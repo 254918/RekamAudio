@@ -19,6 +19,7 @@ import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
+import android.system.ErrnoException
 import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
@@ -50,6 +51,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import android.media.AudioFormat.CHANNEL_IN_STEREO
+import android.system.Os
 import android.media.AudioFormat.ENCODING_PCM_16BIT
 
 @AndroidEntryPoint
@@ -255,11 +257,18 @@ class AudioCaptureService : Service() {
                 }
 
                 val mp3Bitrate = settingsRepository.mp3Bitrate.first()
+                val streamingEnabled = settingsRepository.streamingEncoding.first()
 
                 recordingJob = launch {
                     when (audioQuality) {
                         AudioQuality.HIGH_QUALITY_WAV -> recordWavAudio(bufferSize)
-                        AudioQuality.COMPATIBLE_QUALITY_MP3 -> recordMp3Audio(bufferSize, mp3Bitrate)
+                        AudioQuality.COMPATIBLE_QUALITY_MP3 -> {
+                            if (streamingEnabled) {
+                                recordMp3Streaming(bufferSize, mp3Bitrate)
+                            } else {
+                                recordMp3Audio(bufferSize, mp3Bitrate)
+                            }
+                        }
                         AudioQuality.MEDIUM_QUALITY_M4A -> recordAacAudio(bufferSize)
                     }
                 }
@@ -477,6 +486,94 @@ class AudioCaptureService : Service() {
         }
 
         encodeMp3Async(pcmFile, timestamp, bitrate)
+    }
+
+    /**
+     * Real-time streaming MP3 encoding using a named pipe (FIFO).
+     * PCM data is written to the FIFO while ffmpeg reads from it and encodes
+     * to MP3 simultaneously. This avoids the post-recording transcode wait.
+     * Only supports 128 and 192 kbps (320 kbps is too heavy for real-time).
+     * Falls back to standard async encoding if FIFO creation fails.
+     */
+    private fun recordMp3Streaming(bufferSize: Int, bitrate: Mp3Bitrate) {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val fifoFile = File(cacheDir, "rekam_fifo_$timestamp")
+        val mp3File = File(cacheDir, "rekam_tmp_$timestamp.mp3")
+
+        try {
+            // Create a named pipe for real-time streaming
+            try {
+                Os.mkfifo(fifoFile.absolutePath, 0x1B6) // octal 0666
+            } catch (e: ErrnoException) {
+                Log.e("AudioCaptureService", "FIFO creation failed, falling back to async encoding", e)
+                fifoFile.delete()
+                // Fall back to the standard post-recording approach
+                recordMp3Audio(bufferSize, bitrate)
+                return
+            }
+
+            overlayManager.showEncoding()
+            updateEncodingNotification(0f)
+
+            val command = "-y -f s16le -ar $SAMPLE_RATE -ac $CHANNEL_COUNT " +
+                "-i ${fifoFile.absolutePath} -codec:a libmp3lame -b:a ${bitrate.bitsPerSecond} ${mp3File.absolutePath}"
+
+            // Start ffmpeg reading from the FIFO (runs on ffmpeg-kit's own thread)
+            FFmpegKit.executeAsync(
+                command,
+                { session ->
+                    // Completion callback runs on ffmpeg-kit's executor thread.
+                    try {
+                        if (ReturnCode.isSuccess(session.returnCode)) {
+                            copyFileToMediaStore(mp3File, "recording_$timestamp.mp3", "audio/mpeg")
+                            Log.d("AudioCaptureService", "Streaming MP3 encode succeeded")
+                        } else {
+                            val detail = extractSessionError(session)
+                            Log.e("AudioCaptureService", "Streaming MP3 encode failed: rc=${session.returnCode} $detail")
+                            showEncodeErrorNotification(detail, false)
+                        }
+                    } catch (t: Throwable) {
+                        Log.e("AudioCaptureService", "Error finishing streaming MP3", t)
+                        showEncodeErrorNotification("${t.javaClass.simpleName}: ${t.message}", false)
+                    } finally {
+                        fifoFile.delete()
+                        mp3File.delete()
+                        overlayManager.hideEncoding()
+                        restoreIdleNotification()
+                    }
+                },
+                { /* logs ignored */ },
+                null // No progress statistics callback for streaming
+            )
+
+            // Give ffmpeg time to start and open the FIFO for reading
+            Thread.sleep(300)
+
+            // Open the FIFO for writing. This blocks until the reader (ffmpeg)
+            // opens it for reading, which should already be the case after the delay.
+            FileOutputStream(fifoFile).use { outputStream ->
+                val buffer = ByteArray(bufferSize)
+                while (isRecording) {
+                    val readResult = audioRecord?.read(buffer, 0, bufferSize) ?: 0
+                    if (readResult > 0) {
+                        outputStream.write(buffer, 0, readResult)
+                    }
+                }
+            }
+            // The FIFO closes with FileOutputStream.use {}, which sends EOF to ffmpeg.
+            // ffmpeg will now finish writing the MP3 file.
+
+        } catch (t: Throwable) {
+            Log.e("AudioCaptureService", "Error in streaming MP3 recording", t)
+            mp3File.delete()
+            overlayManager.hideEncoding()
+            restoreIdleNotification()
+            showEncodeErrorNotification("${t.javaClass.simpleName}: ${t.message}", false)
+        } finally {
+            if (fifoFile.exists()) {
+                fifoFile.delete()
+            }
+        }
     }
 
     private fun encodeMp3Async(pcmFile: File, timestamp: String, bitrate: Mp3Bitrate) {

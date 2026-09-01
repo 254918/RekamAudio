@@ -3,6 +3,7 @@ package com.example.rekamaudio.data.repository
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,6 +22,7 @@ class SettingsRepositoryImpl @Inject constructor(
 
     private val AUDIO_QUALITY_KEY = stringPreferencesKey("audio_quality")
     private val MP3_BITRATE_KEY = stringPreferencesKey("mp3_bitrate")
+    private val STREAMING_ENCODING_KEY = booleanPreferencesKey("streaming_encoding")
 
     override val audioQuality: Flow<AudioQuality> = context.dataStore.data
         .map { preferences ->
@@ -51,6 +53,17 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setMp3Bitrate(bitrate: Mp3Bitrate) {
         context.dataStore.edit { preferences ->
             preferences[MP3_BITRATE_KEY] = bitrate.name
+        }
+    }
+
+    override val streamingEncoding: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[STREAMING_ENCODING_KEY] ?: false
+        }
+
+    override suspend fun setStreamingEncoding(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[STREAMING_ENCODING_KEY] = enabled
         }
     }
 }
